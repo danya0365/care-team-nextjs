@@ -21,8 +21,8 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const { status } = await request.json();
-    const result = await drizzleRegistrationRepository.updateStatus(id, status);
+    const body = await request.json();
+    const result = await drizzleRegistrationRepository.update(id, body);
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

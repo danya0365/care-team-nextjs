@@ -54,6 +54,20 @@ export class DrizzleRegistrationRepository implements IRegistrationRepository {
     return result[0];
   }
 
+  async update(id: string, data: Partial<RegistrationData>): Promise<Registration> {
+    const result = await db
+      .update(registrations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(registrations.id, id))
+      .returning();
+
+    if (result.length === 0) {
+      throw new Error('Registration not found');
+    }
+
+    return result[0];
+  }
+
   async delete(id: string): Promise<void> {
     await db.delete(registrations).where(eq(registrations.id, id));
   }

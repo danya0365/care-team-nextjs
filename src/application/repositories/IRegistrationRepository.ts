@@ -25,5 +25,6 @@ export interface IRegistrationRepository {
   getAll(): Promise<Registration[]>;
   getById(id: string): Promise<Registration | null>;
   updateStatus(id: string, status: string): Promise<Registration>;
+  update(id: string, data: Partial<RegistrationData>): Promise<Registration>;
   delete(id: string): Promise<void>;
 }

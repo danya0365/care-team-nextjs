@@ -11,6 +11,8 @@ interface AnimatedButtonProps {
   className?: string;
   href?: string;
   id?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
 }
 
 const variantClasses = {
@@ -41,19 +43,22 @@ export function AnimatedButton({
   className = '',
   href,
   id,
+  type = 'button',
+  disabled = false,
 }: AnimatedButtonProps) {
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
 
   const spring = useSpring({
-    scale: pressed ? 0.92 : hovered ? 1.06 : 1,
-    y: hovered ? -2 : 0,
+    scale: disabled ? 1 : pressed ? 0.92 : hovered ? 1.06 : 1,
+    y: disabled ? 0 : hovered ? -2 : 0,
     config: config.wobbly,
   });
 
   const combinedClassName = `
     inline-flex items-center justify-center gap-2 font-semibold rounded-xl
     transition-colors focus-ring cursor-pointer
+    ${disabled ? 'opacity-50 cursor-not-allowed grayscale-[0.5]' : ''}
     ${variantClasses[variant]}
     ${sizeClasses[size]}
     ${className}
@@ -68,15 +73,15 @@ export function AnimatedButton({
   if (href) {
     return (
       <animated.a
-        href={href}
+        href={disabled ? undefined : href}
         style={animatedStyle}
         className={combinedClassName}
-        onMouseEnter={() => setHovered(true)}
+        onMouseEnter={() => !disabled && setHovered(true)}
         onMouseLeave={() => {
           setHovered(false);
           setPressed(false);
         }}
-        onMouseDown={() => setPressed(true)}
+        onMouseDown={() => !disabled && setPressed(true)}
         onMouseUp={() => setPressed(false)}
         id={id}
       >
@@ -87,15 +92,17 @@ export function AnimatedButton({
 
   return (
     <animated.button
-      onClick={onClick}
+      type={type}
+      disabled={disabled}
+      onClick={disabled ? undefined : onClick}
       style={animatedStyle}
       className={combinedClassName}
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => !disabled && setHovered(true)}
       onMouseLeave={() => {
         setHovered(false);
         setPressed(false);
       }}
-      onMouseDown={() => setPressed(true)}
+      onMouseDown={() => !disabled && setPressed(true)}
       onMouseUp={() => setPressed(false)}
       id={id}
     >
