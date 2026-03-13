@@ -30,6 +30,11 @@ const MAIN_MENU: NavigationItem[] = [
     label: 'ติดต่อเรา',
     href: '/contact',
   },
+  {
+    id: 'register',
+    label: 'ลงทะเบียน',
+    href: '/register',
+  },
 ];
 
 const FOOTER_MENU: NavigationItem[] = [
@@ -52,6 +57,11 @@ const FOOTER_MENU: NavigationItem[] = [
     id: 'contact',
     label: 'ติดต่อเรา',
     href: '/contact',
+  },
+  {
+    id: 'register',
+    label: 'ลงทะเบียน',
+    href: '/register',
   },
   {
     id: 'facebook',
