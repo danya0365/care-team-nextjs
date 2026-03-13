@@ -33,3 +33,11 @@ export async function GET() {
     );
   }
 }
+
+/**
+ * API Route: /api/register/[id]
+ * Since Next.js App Router uses folders for dynamic routes, 
+ * I should actually create a separate file, but for simplicity 
+ * if I want to keep it in one file I need to check how to handle it.
+ * Actually, I'll create a new folder app/api/register/[id]/route.ts
+ */

@@ -56,6 +56,7 @@ export function Header() {
     { href: '/services', label: 'บริการ' },
     { href: '/contact', label: 'ติดต่อเรา' },
     { href: '/register', label: 'ลงทะเบียน' },
+    { href: '/manage-register', label: 'จัดการ' },
   ];
 
   // Mobile menu animation

@@ -24,12 +24,25 @@ export function AboutView({ initialViewModel }: AboutViewProps) {
   if (!viewModel) return null;
 
   return (
-    <div className="flex flex-col pb-20">
-      {/* Header Section */}
-      <section className="bg-primary-50 dark:bg-primary-dark/10 py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div className="flex flex-col pb-20 relative overflow-hidden">
+      {/* Background Patterns */}
+      <div className="fixed top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Header Section with Gradient */}
+      <section 
+        className="relative py-20 md:py-32"
+        style={{
+          background: 'linear-gradient(to bottom, var(--gradient-hero-from), var(--gradient-hero-to))',
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <AnimatedSection>
-            <h1 className="text-4xl md:text-5xl font-bold text-text-primary dark:text-foreground mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-dark/20 text-primary dark:text-primary-light text-sm font-medium mb-6">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              Our Story & Vision
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary dark:text-foreground mb-6 leading-tight">
               เกี่ยวกับ <span className="gradient-text">{viewModel.siteName}</span>
             </h1>
             <p className="text-lg text-text-secondary dark:text-text-muted max-w-3xl mx-auto leading-relaxed">

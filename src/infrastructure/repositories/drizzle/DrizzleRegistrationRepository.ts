@@ -39,6 +39,24 @@ export class DrizzleRegistrationRepository implements IRegistrationRepository {
     const result = await db.select().from(registrations).where(eq(registrations.id, id));
     return result[0] || null;
   }
+
+  async updateStatus(id: string, status: string): Promise<Registration> {
+    const result = await db
+      .update(registrations)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(registrations.id, id))
+      .returning();
+
+    if (result.length === 0) {
+      throw new Error('Registration not found');
+    }
+
+    return result[0];
+  }
+
+  async delete(id: string): Promise<void> {
+    await db.delete(registrations).where(eq(registrations.id, id));
+  }
 }
 
 export const drizzleRegistrationRepository = new DrizzleRegistrationRepository();

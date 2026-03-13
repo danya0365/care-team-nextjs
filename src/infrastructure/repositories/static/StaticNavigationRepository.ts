@@ -64,6 +64,11 @@ const FOOTER_MENU: NavigationItem[] = [
     href: '/register',
   },
   {
+    id: 'manage-register',
+    label: 'จัดการการลงทะเบียน',
+    href: '/manage-register',
+  },
+  {
     id: 'facebook',
     label: 'Facebook',
     href: 'https://www.facebook.com/CareTeamSongkhla',

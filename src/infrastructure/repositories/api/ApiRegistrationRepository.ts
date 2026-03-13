@@ -39,4 +39,30 @@ export class ApiRegistrationRepository implements IRegistrationRepository {
     if (!res.ok) return null;
     return res.json();
   }
+
+  async updateStatus(id: string, status: string): Promise<Registration> {
+    const res = await fetch(`${this.baseUrl}/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || 'Failed to update status');
+    }
+
+    return res.json();
+  }
+
+  async delete(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || 'Failed to delete registration');
+    }
+  }
 }
