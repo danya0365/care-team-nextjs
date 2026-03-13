@@ -1,0 +1,183 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Care Team Songkhla — Design System
+   Mood: Soft blue, warm, clean, healthcare-friendly
+   ============================================================ */
+
+/* ============================================================
+   THEME TOKENS (TailwindCSS v4 @theme)
+   ============================================================ */
+@theme inline {
+  /* Brand Colors — soft healthcare blue */
+  --color-primary: #2196F3;
+  --color-primary-light: #64B5F6;
+  --color-primary-dark: #1565C0;
+  --color-primary-50: #E3F2FD;
+  --color-primary-100: #BBDEFB;
+  --color-primary-200: #90CAF9;
+
+  /* Accent — warm teal */
+  --color-accent: #26A69A;
+  --color-accent-light: #80CBC4;
+  --color-accent-dark: #00897B;
+
+  /* Surface & Background */
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F8FBFF;
+  --color-surface-hover: #F0F7FF;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Text */
+  --color-text-primary: #1A2332;
+  --color-text-secondary: #546E7A;
+  --color-text-muted: #90A4AE;
+  --color-text-inverse: #FFFFFF;
+
+  /* Status Colors */
+  --color-success: #66BB6A;
+  --color-warning: #FFA726;
+  --color-error: #EF5350;
+  --color-info: #42A5F5;
+
+  /* Borders */
+  --color-border: #E0E8F0;
+  --color-border-light: #F0F4F8;
+
+  /* Font */
+  --font-sans: var(--font-noto-sans-thai);
+
+  /* Shadow */
+  --shadow-card: 0 2px 12px rgba(33, 150, 243, 0.08);
+  --shadow-card-hover: 0 8px 30px rgba(33, 150, 243, 0.15);
+  --shadow-elevated: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-header: 0 1px 8px rgba(0, 0, 0, 0.06);
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   CSS VARIABLE TOKENS (Light / Dark)
+   ============================================================ */
+:root {
+  --background: #F4F8FC;
+  --foreground: #1A2332;
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --card-bg: #FFFFFF;
+  --card-border: #E0E8F0;
+  --footer-bg: #1A2332;
+  --footer-text: #CFD8DC;
+  --gradient-hero-from: #E3F2FD;
+  --gradient-hero-to: #F4F8FC;
+  --gradient-accent: linear-gradient(135deg, #2196F3, #26A69A);
+}
+
+.dark {
+  --background: #0F1724;
+  --foreground: #E8EDF2;
+  --header-bg: rgba(15, 23, 36, 0.9);
+  --card-bg: #1A2636;
+  --card-border: #2A3A4E;
+  --footer-bg: #0A1018;
+  --footer-text: #78909C;
+  --gradient-hero-from: #0F1724;
+  --gradient-hero-to: #152238;
+  --gradient-accent: linear-gradient(135deg, #1565C0, #00897B);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-sans-thai), sans-serif;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-primary-200);
+  color: var(--color-primary-dark);
+}
+
+.dark ::selection {
+  background-color: var(--color-primary-dark);
+  color: var(--color-primary-50);
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+/* Glassmorphism */
+.glass {
+  background: var(--header-bg);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card surface */
+.card-surface {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card-surface:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Focus ring */
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
