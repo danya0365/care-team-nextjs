@@ -11,7 +11,7 @@ export const siteConfig = {
     'ให้บริการด้านสุขภาพและสังคมแก่กลุ่มผู้ใช้สารเสพติด โดยมุ่งเน้นการลดอันตรายจากการใช้ยา (Harm Reduction) และการป้องกันโรคติดต่อ',
   phone: '074-800-143',
   facebook: 'Care Team Songkhla',
-  facebookUrl: 'https://www.facebook.com/CareTeamSongkhla',
+  facebookUrl: 'https://www.facebook.com/profile.php?id=100063911255839',
   location: 'จังหวัดสงขลา',
   areas: ['สะเดา', 'จะนะ'],
   partners: [
