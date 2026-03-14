@@ -2,6 +2,10 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 
+if (typeof window !== 'undefined') {
+  throw new Error('🛡️ Security Error: Database client cannot be initialized in the browser.');
+}
+
 /**
  * Database client configuration
  * Falls back to local SQLite (file:local.db) if TURSO_CONNECTION_URL is missing
