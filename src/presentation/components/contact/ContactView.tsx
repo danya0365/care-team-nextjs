@@ -39,37 +39,38 @@ export function ContactView({ initialViewModel }: ContactViewProps) {
         spacing="large"
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Contact Info Cards */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             <AnimatedSection direction="left">
-              <h2 className="text-2xl font-bold text-text-primary dark:text-foreground mb-8">
+              <h2 className="text-3xl font-bold text-text-primary dark:text-foreground mb-4">
                 ช่องทางการติดต่อ
               </h2>
+              <div className="w-16 h-1 bg-primary rounded-full mb-8" />
             </AnimatedSection>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-6">
               <AnimatedSection direction="left" delay={100}>
-                <AnimatedCard className="p-6 flex items-center gap-6">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">
+                <AnimatedCard className="p-8 flex items-center gap-8 group hover:border-primary/30 transition-all shadow-elevated">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
                     📞
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">โทรศัพท์</p>
-                    <p className="text-lg font-bold text-text-primary dark:text-foreground">{viewModel.phone}</p>
+                    <p className="text-xs font-black text-primary uppercase tracking-[0.2em] mb-2">โทรศัพท์สายด่วน</p>
+                    <p className="text-2xl font-bold text-text-primary dark:text-foreground group-hover:text-primary transition-colors">{viewModel.phone}</p>
                   </div>
                 </AnimatedCard>
               </AnimatedSection>
 
               <AnimatedSection direction="left" delay={200}>
-                <AnimatedCard className="p-6 flex items-center gap-6">
-                  <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-2xl">
+                <AnimatedCard className="p-8 flex items-center gap-8 group hover:border-accent/30 transition-all shadow-elevated">
+                  <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-3xl group-hover:bg-accent group-hover:text-white transition-all shadow-sm">
                     👥
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-accent uppercase tracking-widest mb-1">Facebook</p>
-                    <a href={viewModel.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-lg font-bold text-text-primary dark:text-foreground hover:text-primary transition-colors">
+                    <p className="text-xs font-black text-accent uppercase tracking-[0.2em] mb-2">Facebook Page</p>
+                    <a href={viewModel.facebookUrl} target="_blank" rel="noopener noreferrer" className="text-2xl font-bold text-text-primary dark:text-foreground hover:text-accent transition-colors">
                       {viewModel.facebook}
                     </a>
                   </div>
@@ -77,50 +78,62 @@ export function ContactView({ initialViewModel }: ContactViewProps) {
               </AnimatedSection>
 
               <AnimatedSection direction="left" delay={300}>
-                <AnimatedCard className="p-6 flex items-center gap-6">
-                  <div className="w-14 h-14 rounded-2xl bg-warning/10 flex items-center justify-center text-2xl">
+                <AnimatedCard className="p-8 flex items-start gap-8 group hover:border-warning/30 transition-all shadow-elevated">
+                  <div className="w-16 h-16 rounded-2xl bg-warning/10 flex items-center justify-center text-3xl group-hover:bg-warning group-hover:text-white transition-all shadow-sm flex-shrink-0">
                     📍
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-warning uppercase tracking-widest mb-1">ที่อยู่</p>
-                    <p className="text-base font-semibold text-text-primary dark:text-foreground">{viewModel.location}</p>
-                    <p className="text-sm text-text-secondary dark:text-text-muted">ครอบคลุมพื้นที่ {viewModel.areas.join(', ')}</p>
+                    <p className="text-xs font-black text-warning uppercase tracking-[0.2em] mb-2">ที่ตั้งหน่วยงาน</p>
+                    <p className="text-xl font-bold text-text-primary dark:text-foreground mb-2">{viewModel.location}</p>
+                    <div className="flex flex-wrap gap-2">
+                       {viewModel.areas.map(area => (
+                         <span key={area} className="px-3 py-1 bg-surface-elevated dark:bg-primary-dark/20 text-text-secondary dark:text-text-muted text-xs rounded-lg border border-border-light dark:border-card-border font-medium">
+                           {area}
+                         </span>
+                       ))}
+                    </div>
                   </div>
                 </AnimatedCard>
               </AnimatedSection>
             </div>
           </div>
 
-          {/* Contact Form / Placeholder */}
+          {/* Contact Form */}
           <AnimatedSection direction="right" delay={200}>
-            <div className="bg-white dark:bg-card-bg p-8 md:p-10 rounded-[2rem] shadow-elevated border border-border-light dark:border-card-border">
-              <h3 className="text-xl font-bold mb-8 text-text-primary dark:text-foreground">
+            <AnimatedCard className="p-8 md:p-12 relative overflow-hidden shadow-elevated border-t-4 border-t-primary">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              
+              <h3 className="text-2xl font-bold mb-8 text-text-primary dark:text-foreground flex items-center gap-3">
+                <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm">✉️</span>
                 ส่งข้อความถึงเรา
               </h3>
               
-              <div className="space-y-6">
+              <div className="space-y-6 relative z-10">
                  <div>
-                  <label className="block text-sm font-medium text-text-secondary dark:text-text-muted mb-2">ชื่อของคุณ</label>
-                  <input type="text" className="w-full px-4 py-3 rounded-xl bg-surface-elevated dark:bg-primary-dark/10 border-none focus-ring" placeholder="ระบุชื่อ-นามสกุล" />
+                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ชื่อ-นามสกุล ของคุณ</label>
+                  <input type="text" className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-card-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted" placeholder="ตัวอย่าง: สมชาย ใจดี" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary dark:text-text-muted mb-2">เบอร์โทรศัพท์ติดต่อกลับ</label>
-                  <input type="tel" className="w-full px-4 py-3 rounded-xl bg-surface-elevated dark:bg-primary-dark/10 border-none focus-ring" placeholder="ระบุเบอร์โทรศัพท์" />
+                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">เบอร์โทรศัพท์ติดต่อกลับ</label>
+                  <input type="tel" className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-card-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted" placeholder="ระบุเบอร์โทรศัพท์ 10 หลัก" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-text-secondary dark:text-text-muted mb-2">ข้อความหรือหัวข้อที่ต้องการปรึกษา</label>
-                  <textarea rows={4} className="w-full px-4 py-3 rounded-xl bg-surface-elevated dark:bg-primary-dark/10 border-none focus-ring resize-none" placeholder="พิมพ์ข้อความของคุณที่นี่..." />
+                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ข้อความหรือหัวข้อที่ต้องการปรึกษา</label>
+                  <textarea rows={4} className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-card-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none placeholder:text-text-muted" placeholder="พิมพ์รายละเอียดที่คุณต้องการสอบถามหรือปรึกษา..." />
                 </div>
                 
-                <AnimatedButton variant="primary" size="lg" className="w-full shadow-lg">
-                  ส่งข้อความ
+                <AnimatedButton variant="primary" size="lg" className="w-full py-5 text-lg font-bold shadow-xl shadow-primary/20 group">
+                  <span className="group-hover:translate-x-1 transition-transform">ส่งข้อความตอนนี้</span>
                 </AnimatedButton>
               </div>
               
-              <p className="text-center text-xs text-text-muted mt-6 italic">
-                * ข้อมูลทั้งหมดจะถูกเก็บเป็นความลับตามนโยบายความเป็นส่วนตัว
-              </p>
-            </div>
+              <div className="mt-8 pt-6 border-t border-border-light dark:border-card-border">
+                <p className="text-center text-xs text-text-muted leading-relaxed italic">
+                  * ข้อมูลของคุณจะถูกเก็บเป็นความลับสูงสุดตามนโยบายความเป็นส่วนตัว <br className="hidden md:block"/>
+                  เพื่อให้คุณได้รับการดูแลที่ปลอดภัยและเป็นส่วนตัวที่สุด
+                </p>
+              </div>
+            </AnimatedCard>
           </AnimatedSection>
         </div>
       </div>
