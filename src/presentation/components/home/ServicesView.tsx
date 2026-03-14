@@ -53,32 +53,32 @@ export function ServicesView({ initialViewModel }: ServicesViewProps) {
           <div className="space-y-8">
             {viewModel.rrttprSteps.map((step, index) => (
               <AnimatedSection key={step.id} direction={index % 2 === 0 ? 'left' : 'right'} delay={index * 50}>
-                <div className="flex flex-col md:flex-row gap-8 items-center bg-white dark:bg-card-bg p-8 rounded-2xl border border-border-light dark:border-card-border shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex-shrink-0 w-20 h-20 rounded-3xl flex items-center justify-center text-4xl" style={{ backgroundColor: `${step.color}15` }}>
+                <AnimatedCard className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-center relative overflow-hidden group">
+                  <div className="flex-shrink-0 w-20 h-20 rounded-3xl flex items-center justify-center text-4xl shadow-inner" style={{ backgroundColor: `${step.color}15` }}>
                     {step.icon}
                   </div>
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                       <span className="text-sm font-bold bg-primary text-white px-3 py-1 rounded-lg">
+                    <div className="flex items-center gap-3 mb-4">
+                       <span className="text-xs font-bold bg-primary text-white px-3 py-1 rounded-lg">
                         Step {step.step}
                       </span>
-                      <span className="text-sm font-semibold text-primary uppercase tracking-widest">
+                      <span className="text-xs font-semibold text-primary uppercase tracking-widest">
                         {step.titleEn}
                       </span>
                     </div>
-                    <h3 className="text-2xl font-bold text-text-primary dark:text-foreground mb-3">
+                    <h3 className="text-2xl font-bold text-text-primary dark:text-foreground mb-3 group-hover:text-primary transition-colors">
                       {step.titleTh}
                     </h3>
                     <p className="text-text-secondary dark:text-text-muted leading-relaxed">
                       {step.description}
                     </p>
                   </div>
-                  <div className="hidden lg:block">
-                    <span className="text-8xl font-black text-primary/5 select-none">
+                  <div className="hidden lg:block absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <span className="text-9xl font-black text-primary select-none">
                       0{step.step}
                     </span>
                   </div>
-                </div>
+                </AnimatedCard>
               </AnimatedSection>
             ))}
           </div>
@@ -90,19 +90,19 @@ export function ServicesView({ initialViewModel }: ServicesViewProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <AnimatedSection direction="left">
-               <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center text-3xl mb-6">
+               <div className="w-16 h-16 rounded-2xl bg-accent/20 flex items-center justify-center text-3xl mb-6 shadow-sm">
                 {viewModel.methadoneService.icon}
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-text-primary dark:text-foreground mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-text-primary dark:text-foreground mb-6 leading-tight">
                 {viewModel.methadoneService.title}
               </h2>
-              <p className="text-lg text-text-secondary dark:text-text-muted mb-8 leading-relaxed">
+              <p className="text-lg text-text-secondary dark:text-text-muted mb-8 leading-relaxed italic">
                 {viewModel.methadoneService.description}
               </p>
               
-              <div className="p-6 bg-white dark:bg-card-bg rounded-2xl shadow-card border border-accent/10">
+              <AnimatedCard className="p-6 border-accent/20">
                 <h4 className="font-bold text-accent mb-4 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-accent" />
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                   กลุ่มเป้าหมายหลัก
                 </h4>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -112,14 +112,14 @@ export function ServicesView({ initialViewModel }: ServicesViewProps) {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </AnimatedCard>
             </AnimatedSection>
 
             <AnimatedSection direction="right" delay={200}>
-              <div className="bg-white dark:bg-card-bg p-8 md:p-10 rounded-3xl shadow-elevated border border-border-light dark:border-card-border relative overflow-hidden">
+              <AnimatedCard className="p-8 md:p-10 relative overflow-hidden shadow-elevated">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 
-                <h3 className="text-xl font-bold mb-8 text-text-primary dark:text-foreground">
+                <h3 className="text-2xl font-bold mb-8 text-text-primary dark:text-foreground">
                   ขั้นตอนการรับบริการ
                 </h3>
                 
@@ -138,7 +138,7 @@ export function ServicesView({ initialViewModel }: ServicesViewProps) {
                     </div>
                   ))}
                 </div>
-              </div>
+              </AnimatedCard>
             </AnimatedSection>
           </div>
         </div>
