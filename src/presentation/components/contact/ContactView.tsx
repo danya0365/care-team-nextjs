@@ -107,19 +107,18 @@ export function ContactView({ initialViewModel }: ContactViewProps) {
                 <span className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-sm">✉️</span>
                 ส่งข้อความถึงเรา
               </h3>
-              
-              <div className="space-y-6 relative z-10">
+                            <div className="space-y-6 relative z-10">
                  <div>
                   <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ชื่อ-นามสกุล ของคุณ</label>
-                  <input type="text" className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-card-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted" placeholder="ตัวอย่าง: สมชาย ใจดี" />
+                  <input type="text" className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted" placeholder="ตัวอย่าง: สมชาย ใจดี" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">เบอร์โทรศัพท์ติดต่อกลับ</label>
-                  <input type="tel" className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-card-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted" placeholder="ระบุเบอร์โทรศัพท์ 10 หลัก" />
+                  <input type="tel" className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted" placeholder="ระบุเบอร์โทรศัพท์ 10 หลัก" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ข้อความหรือหัวข้อที่ต้องการปรึกษา</label>
-                  <textarea rows={4} className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-card-border focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none placeholder:text-text-muted" placeholder="พิมพ์รายละเอียดที่คุณต้องการสอบถามหรือปรึกษา..." />
+                  <textarea rows={4} className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none placeholder:text-text-muted" placeholder="พิมพ์รายละเอียดที่คุณต้องการสอบถามหรือปรึกษา..." />
                 </div>
                 
                 <AnimatedButton variant="primary" size="lg" className="w-full py-5 text-lg font-bold shadow-xl shadow-primary/20 group">
