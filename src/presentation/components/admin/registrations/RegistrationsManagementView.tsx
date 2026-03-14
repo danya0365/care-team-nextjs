@@ -122,8 +122,8 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
         <AnimatedSection>
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="relative min-w-[300px]">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted transition-colors group-focus-within:text-primary" />
+              <div className="relative min-w-[300px] group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted transition-colors group-focus-within:text-primary z-10 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="ค้นหาชื่อ, อีเมล หรือโทรศัพท์..."
