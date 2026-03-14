@@ -5,68 +5,99 @@
 /* custom variants */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ============================================
+   @theme — Design Tokens (generates utility classes)
+   
+   These tokens generate Tailwind utility classes automatically:
+   --color-background  → bg-background, text-background
+   --color-primary     → bg-primary, text-primary, border-primary
+   --color-surface     → bg-surface, text-surface
+   etc.
+   ============================================ */
+
 @theme {
-  /* Brand Colors — soft healthcare blue */
-  --color-primary: #2196F3;
-  --color-primary-light: #64B5F6;
-  --color-primary-dark: #1565C0;
-  --color-primary-50: #E3F2FD;
-  --color-primary-100: #BBDEFB;
-  --color-primary-200: #90CAF9;
+  /* ── Tailwind Color Tokens ── */
+  --color-primary: var(--brand-primary);
+  --color-primary-light: var(--brand-primary-light);
+  --color-primary-dark: var(--brand-primary-dark);
+  --color-primary-50: var(--brand-primary-50);
+  --color-primary-100: var(--brand-primary-100);
+  --color-primary-200: var(--brand-primary-200);
 
-  /* Accent — warm teal */
-  --color-accent: #26A69A;
-  --color-accent-light: #80CBC4;
-  --color-accent-dark: #00897B;
+  --color-accent: var(--brand-accent);
+  --color-accent-light: var(--brand-accent-light);
+  --color-accent-dark: var(--brand-accent-dark);
 
-  /* Surface & Background */
-  --color-surface: #FFFFFF;
-  --color-surface-elevated: #F8FBFF;
-  --color-surface-hover: #F0F7FF;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--ui-bg);
+  --color-foreground: var(--ui-fg);
+  --color-surface: var(--ui-surface);
+  --color-surface-elevated: var(--ui-surface-elevated);
+  --color-surface-hover: var(--ui-surface-hover);
 
-  /* Text */
+  /* ── Text ── */
   --color-text-primary: #1A2332;
   --color-text-secondary: #546E7A;
   --color-text-muted: #90A4AE;
   --color-text-inverse: #FFFFFF;
 
-  /* Status Colors */
+  /* ── Status Colors ── */
   --color-success: #66BB6A;
   --color-warning: #FFA726;
   --color-error: #EF5350;
   --color-info: #42A5F5;
 
-  /* Borders */
-  --color-border: #E0E8F0;
+  /* ── Borders ── */
+  --color-border: var(--ui-border);
   --color-border-light: #F0F4F8;
 
-  /* Font */
+  /* ── Font ── */
   --font-sans: var(--font-noto-sans-thai);
 
-  /* Shadow */
+  /* ── Shadows ── */
   --shadow-card: 0 2px 12px rgba(33, 150, 243, 0.08);
   --shadow-card-hover: 0 8px 30px rgba(33, 150, 243, 0.15);
   --shadow-elevated: 0 4px 20px rgba(0, 0, 0, 0.08);
   --shadow-header: 0 1px 8px rgba(0, 0, 0, 0.06);
 
-  /* Border Radius */
+  /* ── Radii ── */
   --radius-sm: 0.375rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* Transitions */
+  /* ── Footer ── */
+  --color-footer-bg: var(--footer-bg);
+  --color-footer-text: var(--footer-text);
+
+  /* ── Transitions ── */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :root {
-  --background: #F4F8FC;
-  --foreground: #1A2332;
+  /* Brand Values - Light */
+  --brand-primary: #2196F3;
+  --brand-primary-light: #64B5F6;
+  --brand-primary-dark: #1565C0;
+  --brand-primary-50: #E3F2FD;
+  --brand-primary-100: #BBDEFB;
+  --brand-primary-200: #90CAF9;
+
+  --brand-accent: #26A69A;
+  --brand-accent-light: #80CBC4;
+  --brand-accent-dark: #00897B;
+
+  /* UI Values - Light */
+  --ui-bg: #F4F8FC;
+  --ui-fg: #1A2332;
+  --ui-surface: #FFFFFF;
+  --ui-surface-elevated: #F8FBFF;
+  --ui-surface-hover: #F0F7FF;
+  --ui-border: #E0E8F0;
+
+  /* Header/Hero Specific */
   --header-bg: rgba(255, 255, 255, 0.85);
   --card-bg: #FFFFFF;
   --card-border: #E0E8F0;
@@ -78,8 +109,22 @@
 }
 
 .dark {
-  --background: #0F1724;
-  --foreground: #E8EDF2;
+  /* Brand Values Override for Dark (preserving healthcare vibe) */
+  --brand-primary: #64B5F6;
+  --brand-primary-dark: #1565C0;
+  
+  --brand-accent: #4DB6AC;
+  --brand-accent-dark: #00897B;
+
+  /* UI Values - Dark */
+  --ui-bg: #0F1724;
+  --ui-fg: #E8EDF2;
+  --ui-surface: #1A2636;
+  --ui-surface-elevated: #1E2D3E;
+  --ui-surface-hover: #253449;
+  --ui-border: #2A3A4E;
+
+  /* Header/Hero Specific - Dark */
   --header-bg: rgba(15, 23, 36, 0.9);
   --card-bg: #1A2636;
   --card-border: #2A3A4E;

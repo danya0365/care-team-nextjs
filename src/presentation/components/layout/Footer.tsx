@@ -55,7 +55,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-[var(--footer-bg)] text-[var(--footer-text)]" id="footer">
+    <footer className="bg-footer-bg text-footer-text" id="footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main footer content */}
         <div className="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -68,10 +68,10 @@ export function Footer() {
               </div>
               <div>
                 <h3 className="text-white font-bold text-base">{siteConfig.name}</h3>
-                <p className="text-xs text-gray-500">{siteConfig.location}</p>
+                <p className="text-xs text-text-muted">{siteConfig.location}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+            <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
               {siteConfig.description}
             </p>
           </div>
@@ -93,7 +93,7 @@ export function Footer() {
             <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wider">
               ติดต่อเรา
             </h4>
-            <div className="space-y-3 text-sm text-gray-400">
+            <div className="space-y-3 text-sm text-text-secondary">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-primary-light flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -123,11 +123,11 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-700/50 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-gray-500">
+        <div className="border-t border-border/50 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-text-muted">
             © {currentYear} {siteConfig.name}. All rights reserved.
           </p>
-          <div className="flex items-center gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-4 text-xs text-text-muted">
             {siteConfig.partners.slice(0, 2).map((partner) => (
               <span key={partner}>{partner}</span>
             ))}

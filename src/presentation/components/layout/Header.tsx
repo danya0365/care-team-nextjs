@@ -1,100 +1,85 @@
 'use client';
 
+/**
+ * Header
+ * Redesigned navigation header with glassmorphism and smooth animations
+ * Preserving care-team-nextjs color mood
+ */
+
+import { siteConfig } from '@/src/config/site';
+import { animated, useSpring, config } from '@react-spring/web';
+import { Menu, X, Heart, Info, Briefcase, Mail, UserPlus, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSpring, animated, config } from '@react-spring/web';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeToggle } from './ThemeToggle';
-import { siteConfig } from '@/src/config/site';
+import { cn } from '@/src/presentation/utils/cn';
 
-interface NavLinkProps {
-  href: string;
-  label: string;
-  isActive: boolean;
-}
-
-function NavLink({ href, label, isActive }: NavLinkProps) {
-  const [hovered, setHovered] = useState(false);
-
-  const spring = useSpring({
-    y: hovered ? -2 : 0,
-    opacity: hovered || isActive ? 1 : 0.8,
-    config: config.gentle,
-  });
-
-  return (
-    <animated.div
-      style={{
-        transform: spring.y.to((y) => `translateY(${y}px)`),
-        opacity: spring.opacity,
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <Link
-        href={href}
-        className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-colors
-          ${
-            isActive
-              ? 'text-primary dark:text-primary-light bg-primary-50 dark:bg-primary-dark/20'
-              : 'text-text-secondary dark:text-text-muted hover:text-primary dark:hover:text-primary-light hover:bg-primary-50/50 dark:hover:bg-primary-dark/10'
-          }`}
-      >
-        {label}
-      </Link>
-    </animated.div>
-  );
-}
+const navLinks = [
+  { name: 'หน้าแรก', href: '/', icon: Heart },
+  { name: 'เกี่ยวกับเรา', href: '/about', icon: Info },
+  { name: 'บริการ', href: '/services', icon: Briefcase },
+  { name: 'ติดต่อเรา', href: '/contact', icon: Mail },
+  { name: 'ลงทะเบียน', href: '/register', icon: UserPlus },
+  { name: 'จัดการ', href: '/manage-register', icon: ShieldCheck },
+];
 
 export function Header() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  const navItems = [
-    { href: '/', label: 'หน้าแรก' },
-    { href: '/about', label: 'เกี่ยวกับเรา' },
-    { href: '/services', label: 'บริการ' },
-    { href: '/contact', label: 'ติดต่อเรา' },
-    { href: '/register', label: 'ลงทะเบียน' },
-    { href: '/manage-register', label: 'จัดการ' },
-  ];
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Mobile menu animation
-  const mobileMenuSpring = useSpring({
-    height: mobileMenuOpen ? 'auto' : '0px',
-    opacity: mobileMenuOpen ? 1 : 0,
-    config: config.gentle,
+  const logoSpring = useSpring({
+    from: { opacity: 0, x: -20 },
+    to: { opacity: 1, x: 0 },
+    config: { tension: 200, friction: 20 },
   });
 
-  // Logo hover animation
-  const [logoHovered, setLogoHovered] = useState(false);
-  const logoSpring = useSpring({
-    scale: logoHovered ? 1.05 : 1,
-    config: config.wobbly,
+  const menuSpring = useSpring({
+    opacity: isMenuOpen ? 1 : 0,
+    transform: isMenuOpen ? 'translateY(0)' : 'translateY(-20px)',
+    config: { tension: 300, friction: 25 },
   });
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-border-light dark:border-card-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+      {/* Glassmorphism background layer */}
+      <div 
+        className={cn(
+          "absolute inset-0 transition-all duration-300",
+          isScrolled 
+            ? "bg-white/80 dark:bg-background/80 backdrop-blur-xl border-b border-border shadow-header" 
+            : "bg-transparent border-b border-transparent"
+        )} 
+      />
+      
+      <nav className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20 sm:h-22">
           {/* Logo */}
-          <animated.div
-            style={{ transform: logoSpring.scale.to((s) => `scale(${s})`) }}
-            onMouseEnter={() => setLogoHovered(true)}
-            onMouseLeave={() => setLogoHovered(false)}
-          >
+          <animated.div style={logoSpring}>
             <Link href="/" className="flex items-center gap-3 group" id="header-logo">
-              {/* Logo icon */}
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center
-                bg-gradient-to-br from-primary to-accent text-white font-bold text-sm
-                shadow-md group-hover:shadow-lg transition-shadow">
-                CT
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-2xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity" />
+                <div className="relative w-11 h-11 rounded-2xl flex items-center justify-center
+                  bg-gradient-to-br from-primary to-accent text-white font-bold text-base
+                  shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                  CT
+                </div>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-base font-bold text-text-primary dark:text-foreground leading-tight">
+                <h1 className="text-lg font-bold text-text-primary dark:text-foreground leading-tight tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text group-hover:text-transparent transition-all duration-300">
                   {siteConfig.name}
                 </h1>
-                <p className="text-[10px] text-text-muted leading-tight">
+                <p className="text-[11px] text-text-muted font-medium uppercase tracking-wider">
                   Harm Reduction • สงขลา
                 </p>
               </div>
@@ -102,75 +87,120 @@ export function Header() {
           </animated.div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1" id="main-nav">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.href}
-                href={item.href}
-                label={item.label}
-                isActive={pathname === item.href}
-              />
+          <div className="hidden md:flex items-center gap-1" id="main-nav">
+            {navLinks.map((link, index) => (
+              <NavLink 
+                key={link.href} 
+                href={link.href} 
+                index={index}
+                isActive={pathname === link.href}
+              >
+                {link.name}
+              </NavLink>
             ))}
-          </nav>
+          </div>
 
           {/* Right section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle />
 
             {/* Mobile hamburger */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden w-10 h-10 rounded-lg flex items-center justify-center
-                hover:bg-primary-50 dark:hover:bg-primary-dark/20 transition-colors focus-ring cursor-pointer"
-              aria-label="เปิดเมนู"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden w-11 h-11 rounded-xl flex items-center justify-center
+                hover:bg-primary-50 dark:hover:bg-primary-dark/20 transition-all duration-200 
+                focus-ring cursor-pointer text-text-primary dark:text-foreground"
+              aria-label={isMenuOpen ? "ปิดเมนู" : "เปิดเมนู"}
               id="mobile-menu-button"
             >
-              <svg
-                className="w-5 h-5 text-text-primary dark:text-foreground"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
       {/* Mobile menu */}
-      <animated.div
-        style={{
-          overflow: 'hidden',
-          opacity: mobileMenuSpring.opacity,
-        }}
-        className={`md:hidden border-t border-border-light dark:border-card-border ${
-          mobileMenuOpen ? 'block' : 'hidden'
-        }`}
-      >
-        <nav className="px-4 py-3 space-y-1" id="mobile-nav">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
-                ${
-                  pathname === item.href
-                    ? 'text-primary dark:text-primary-light bg-primary-50 dark:bg-primary-dark/20'
-                    : 'text-text-secondary dark:text-text-muted hover:text-primary dark:hover:text-primary-light hover:bg-primary-50/50 dark:hover:bg-primary-dark/10'
-                }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </animated.div>
+      {isMenuOpen && (
+        <animated.div
+          style={menuSpring}
+          className="md:hidden absolute top-full left-0 right-0 mx-4 mt-2 overflow-hidden
+            bg-white/95 dark:bg-ui-surface/95 backdrop-blur-2xl rounded-3xl
+            border border-border/50 shadow-2xl z-40"
+        >
+          <nav className="p-4 space-y-1" id="mobile-nav">
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-5 py-3.5 rounded-2xl text-sm font-semibold transition-all duration-200",
+                    isActive
+                      ? "text-primary dark:text-primary-light bg-primary-50 dark:bg-primary-dark/20"
+                      : "text-text-secondary dark:text-text-muted hover:text-primary dark:hover:text-primary-light hover:bg-primary-50/50 dark:hover:bg-primary-dark/10"
+                  )}
+                >
+                  <Icon className={cn("w-4.5 h-4.5", isActive ? "text-primary" : "opacity-70")} />
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+        </animated.div>
+      )}
     </header>
+  );
+}
+
+interface NavLinkProps {
+  href: string;
+  children: React.ReactNode;
+  isActive: boolean;
+  index: number;
+}
+
+function NavLink({ href, children, isActive, index }: NavLinkProps) {
+  const spring = useSpring({
+    from: { opacity: 0, y: -10 },
+    to: { opacity: 1, y: 0 },
+    delay: index * 40,
+    config: { tension: 200, friction: 20 },
+  });
+
+  const [hoverSpring, hoverApi] = useSpring(() => ({
+    scale: 1,
+    y: 0,
+    config: config.gentle,
+  }));
+
+  return (
+    <animated.div
+      style={{ 
+        ...spring, 
+        transform: hoverSpring.y.to(y => `translateY(${y}px) scale(${hoverSpring.scale.get()})`) 
+      }}
+      onMouseEnter={() => hoverApi.start({ scale: 1.02, y: -2 })}
+      onMouseLeave={() => hoverApi.start({ scale: 1, y: 0 })}
+    >
+      <Link
+        href={href}
+        className={cn(
+          "relative px-5 py-2.5 text-[14px] font-semibold rounded-2xl transition-all duration-300",
+          isActive
+            ? "text-primary dark:text-primary-light bg-primary-50/80 dark:bg-primary-dark/20 shadow-sm"
+            : "text-text-secondary dark:text-text-muted hover:text-primary dark:hover:text-primary-light"
+        )}
+      >
+        {children}
+        {isActive && (
+          <animated.div 
+            className="absolute bottom-1 left-5 right-5 h-0.5 rounded-full bg-primary/40"
+          />
+        )}
+      </Link>
+    </animated.div>
   );
 }

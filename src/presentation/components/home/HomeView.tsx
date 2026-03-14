@@ -56,10 +56,7 @@ export function HomeView({ initialViewModel }: HomeViewProps) {
           HERO SECTION
           ============================================================ */}
       <section
-        className="relative overflow-hidden py-20 md:py-32"
-        style={{
-          background: 'linear-gradient(to bottom, var(--gradient-hero-from), var(--gradient-hero-to))',
-        }}
+        className="relative overflow-hidden py-20 md:py-32 bg-gradient-to-b from-gradient-hero-from to-gradient-hero-to"
         id="hero"
       >
         {/* Decorative background circles */}
@@ -171,10 +168,7 @@ export function HomeView({ initialViewModel }: HomeViewProps) {
           STATISTICS SECTION
           ============================================================ */}
       <section
-        className="py-16 md:py-24"
-        style={{
-          background: 'linear-gradient(to bottom, var(--gradient-hero-from), var(--gradient-hero-to))',
-        }}
+        className="py-16 md:py-24 bg-gradient-to-b from-gradient-hero-from to-gradient-hero-to"
         id="stats-section"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -267,10 +261,7 @@ export function HomeView({ initialViewModel }: HomeViewProps) {
           CONTACT CTA SECTION
           ============================================================ */}
       <section
-        className="py-16 md:py-24"
-        style={{
-          background: 'linear-gradient(to bottom, var(--gradient-hero-from), var(--gradient-hero-to))',
-        }}
+        className="py-16 md:py-24 bg-gradient-to-b from-gradient-hero-from to-gradient-hero-to"
         id="contact-section"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
