@@ -76,7 +76,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
               variant="outline"
               size="sm"
               onClick={() => actions.refresh()}
-              className="bg-white/50 dark:bg-card-bg/50 backdrop-blur-md rounded-2xl group"
+              className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10"
             >
               <RefreshCw className={`w-4 h-4 ${state.loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
               รีเฟรชข้อมูล

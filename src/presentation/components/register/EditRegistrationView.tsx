@@ -63,7 +63,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
             variant="outline"
             size="sm"
             onClick={actions.cancel}
-            className="group backdrop-blur-md bg-white/50 dark:bg-card-bg/50 rounded-2xl border-primary/20"
+            className="group backdrop-blur-md bg-white/50 dark:bg-white/10 rounded-2xl border-primary/20 dark:border-white/10"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             กลับหน้าจัดการ
