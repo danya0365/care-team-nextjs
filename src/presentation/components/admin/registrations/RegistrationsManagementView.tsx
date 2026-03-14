@@ -263,6 +263,13 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                     <thead>
                       <tr className="bg-primary/5 dark:bg-primary-dark/5 text-[10px] md:text-xs font-bold uppercase tracking-widest text-text-muted-foreground/80">
                         <DataTableHeader 
+                          label="วันที่สร้าง" 
+                          sortBy="createdAt" 
+                          currentSortBy={state.sortBy} 
+                          currentSortOrder={state.sortOrder} 
+                          onSort={actions.applySorting} 
+                        />
+                        <DataTableHeader 
                           label="ข้อมูลผู้ลงทะเบียน" 
                           sortBy="name" 
                           currentSortBy={state.sortBy} 
@@ -298,6 +305,20 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                       {registrations.map((reg) => (
                         <tr key={reg.id} className="hover:bg-primary/5 dark:hover:bg-primary-dark/5 transition-colors group">
                           <td className="px-6 md:px-8 py-6">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex items-center gap-2 text-primary font-black text-[11px] mb-1">
+                                <Clock className="w-3.5 h-3.5" />
+                                {new Date(reg.createdAt).toLocaleDateString('th-TH')}
+                              </div>
+                              <div className="text-sm font-black text-text-primary dark:text-foreground">
+                                {new Date(reg.createdAt).toLocaleTimeString('th-TH', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })} น.
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
                             <div className="font-bold text-text-primary dark:text-foreground group-hover:text-primary transition-colors text-base">{reg.name}</div>
                             <div className="text-sm text-text-secondary dark:text-text-muted flex flex-col gap-1.5 mt-2">
                               <div className="flex items-center gap-2">
@@ -310,16 +331,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                                   {reg.email}
                                 </div>
                               )}
-                            </div>
-                            <div className="mt-3 flex items-center gap-2 text-[10px] text-text-muted font-bold tracking-tight">
-                              <Clock className="w-3 h-3 opacity-50" />
-                              {new Date(reg.createdAt).toLocaleString('th-TH', { 
-                                day: 'numeric', 
-                                month: 'short', 
-                                year: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
                             </div>
                           </td>
                           <td className="px-6 md:px-8 py-6">
