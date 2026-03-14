@@ -1,8 +1,8 @@
+import '@/public/styles/index.css';
+import { MainLayout } from '@/src/presentation/components/layout/MainLayout';
+import { ThemeProvider } from '@/src/presentation/components/layout/ThemeProvider';
 import type { Metadata } from 'next';
 import { Noto_Sans_Thai } from 'next/font/google';
-import './globals.css';
-import { ThemeProvider } from '@/src/presentation/components/layout/ThemeProvider';
-import { MainLayout } from '@/src/presentation/components/layout/MainLayout';
 
 const notoSansThai = Noto_Sans_Thai({
   variable: '--font-noto-sans-thai',
