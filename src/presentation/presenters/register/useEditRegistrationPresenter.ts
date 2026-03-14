@@ -58,7 +58,7 @@ export function useEditRegistrationPresenter(
       
       // Redirect back after success
       setTimeout(() => {
-        router.push('/manage-register');
+        router.push('/admin/manage-register');
         router.refresh();
       }, 1500);
     } catch (err: any) {
@@ -70,7 +70,7 @@ export function useEditRegistrationPresenter(
     state,
     actions: {
       update,
-      cancel: () => router.push('/manage-register'),
+      cancel: () => router.push('/admin/manage-register'),
     }
   };
 }

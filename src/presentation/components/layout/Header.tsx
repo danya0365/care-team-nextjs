@@ -21,7 +21,7 @@ const navLinks = [
   { name: 'บริการ', href: '/services', icon: Briefcase },
   { name: 'ติดต่อเรา', href: '/contact', icon: Mail },
   { name: 'ลงทะเบียน', href: '/register', icon: UserPlus },
-  { name: 'จัดการ', href: '/manage-register', icon: ShieldCheck },
+  { name: 'จัดการ', href: '/admin', icon: ShieldCheck },
 ];
 
 export function Header() {

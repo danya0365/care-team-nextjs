@@ -63,7 +63,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
       <PageHeader
         title={<><span className="gradient-text">แก้ไข</span>ข้อมูลผู้ลงทะเบียน</>}
         description={`รหัสอ้างอิง: #${id.slice(0, 8).toUpperCase()}`}
-        spacing="large"
+        spacing="default"
       >
         <div className="mt-8">
           <AnimatedButton

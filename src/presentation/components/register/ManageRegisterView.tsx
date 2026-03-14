@@ -62,7 +62,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
       <PageHeader
         title={<><span className="gradient-text">จัดการ</span>การลงทะเบียน</>}
         description="ตรวจสอบและบริหารจัดการข้อมูลผู้ลงทะเบียน เพื่อการประสานงานที่มีประสิทธิภาพและเป็นระบบ"
-        spacing="large"
+        spacing="default"
       >
         <div className="mt-8 flex justify-center md:justify-start">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary dark:text-primary-light text-xs font-bold shadow-sm backdrop-blur-sm">
@@ -190,7 +190,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                               </button>
                             )}
                             <a
-                              href={`/manage-register/edit/${reg.id}`}
+                              href={`/admin/manage-register/edit/${reg.id}`}
                               className="w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/10"
                               title="แก้ไขข้อมูล"
                             >
