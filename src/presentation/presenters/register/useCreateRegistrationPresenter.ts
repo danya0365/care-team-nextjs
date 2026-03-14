@@ -1,32 +1,31 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { EditRegistrationViewModel, EditRegistrationPresenter } from './EditRegistrationPresenter';
-import { createClientEditRegistrationPresenter } from './EditRegistrationPresenterClientFactory';
+import { CreateRegistrationViewModel, CreateRegistrationPresenter } from './CreateRegistrationPresenter';
+import { createClientCreateRegistrationPresenter } from './CreateRegistrationPresenterClientFactory';
 import { RegistrationData } from '@/src/application/repositories/IRegistrationRepository';
 import { useRouter } from 'next/navigation';
 
-export interface EditRegistrationState {
-  viewModel: EditRegistrationViewModel | null;
+export interface CreateRegistrationState {
+  viewModel: CreateRegistrationViewModel | null;
   loading: boolean;
   submitting: boolean;
   error: string | null;
   success: boolean;
 }
 
-export function useEditRegistrationPresenter(
-  id: string,
-  initialViewModel?: EditRegistrationViewModel,
-  presenterOverride?: EditRegistrationPresenter
+export function useCreateRegistrationPresenter(
+  initialViewModel?: CreateRegistrationViewModel,
+  presenterOverride?: CreateRegistrationPresenter
 ) {
   const presenter = useMemo(
-    () => presenterOverride ?? createClientEditRegistrationPresenter(),
+    () => presenterOverride ?? createClientCreateRegistrationPresenter(),
     [presenterOverride]
   );
   
   const router = useRouter();
 
-  const [state, setState] = useState<EditRegistrationState>({
+  const [state, setState] = useState<CreateRegistrationState>({
     viewModel: initialViewModel ?? null,
     loading: !initialViewModel,
     submitting: false,
@@ -37,12 +36,12 @@ export function useEditRegistrationPresenter(
   const fetchViewModel = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const viewModel = await presenter.getViewModel(id);
+      const viewModel = await presenter.getViewModel();
       setState(prev => ({ ...prev, viewModel, loading: false }));
     } catch (err: any) {
       setState(prev => ({ ...prev, error: err.message, loading: false }));
     }
-  }, [presenter, id]);
+  }, [presenter]);
 
   useEffect(() => {
     if (!initialViewModel) {
@@ -50,10 +49,10 @@ export function useEditRegistrationPresenter(
     }
   }, [initialViewModel, fetchViewModel]);
 
-  const update = async (data: Partial<RegistrationData>) => {
+  const create = async (data: RegistrationData) => {
     setState(prev => ({ ...prev, submitting: true, error: null }));
     try {
-      await presenter.updateRegistration(id, data);
+      await presenter.createRegistration(data);
       setState(prev => ({ ...prev, submitting: false, success: true }));
       
       // Redirect back after success
@@ -69,8 +68,9 @@ export function useEditRegistrationPresenter(
   return {
     state,
     actions: {
-      update,
+      create,
       cancel: () => router.push('/admin/registrations'),
+      refresh: fetchViewModel,
     }
   };
 }

@@ -1,26 +1,26 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ManageRegisterViewModel, ManageRegisterPresenter } from './ManageRegisterPresenter';
-import { createClientManageRegisterPresenter } from './ManageRegisterPresenterClientFactory';
+import { RegistrationsViewModel, RegistrationsPresenter } from './RegistrationsPresenter';
+import { createClientRegistrationsPresenter } from './RegistrationsPresenterClientFactory';
 
-export interface ManageRegisterState {
-  viewModel: ManageRegisterViewModel | null;
+export interface RegistrationsState {
+  viewModel: RegistrationsViewModel | null;
   loading: boolean;
   error: string | null;
   actionLoading: string | null; // ID of registration being updated
 }
 
-export function useManageRegisterPresenter(
-  initialViewModel?: ManageRegisterViewModel,
-  presenterOverride?: ManageRegisterPresenter
+export function useRegistrationsPresenter(
+  initialViewModel?: RegistrationsViewModel,
+  presenterOverride?: RegistrationsPresenter
 ) {
   const presenter = useMemo(
-    () => presenterOverride ?? createClientManageRegisterPresenter(),
+    () => presenterOverride ?? createClientRegistrationsPresenter(),
     [presenterOverride]
   );
 
-  const [state, setState] = useState<ManageRegisterState>({
+  const [state, setState] = useState<RegistrationsState>({
     viewModel: initialViewModel ?? null,
     loading: !initialViewModel,
     error: null,

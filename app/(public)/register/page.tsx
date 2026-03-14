@@ -1,16 +1,9 @@
-import { RegisterView } from '@/src/presentation/components/register/RegisterView';
-import { createServerRegisterPresenter } from '@/src/presentation/presenters/register/RegisterPresenterServerFactory';
-import { Metadata } from 'next';
-
-export async function generateMetadata(): Promise<Metadata> {
-  const presenter = createServerRegisterPresenter();
-  return presenter.generateMetadata();
-}
+import { redirect } from 'next/navigation';
 
 /**
- * Registration Page
- * Implementation using Clean Architecture
+ * Legacy Registration Page
+ * Redirect to home page as registrations are now activity-specific
  */
 export default function RegisterPage() {
-  return <RegisterView />;
+  redirect('/');
 }

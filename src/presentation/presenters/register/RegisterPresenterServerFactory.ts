@@ -1,9 +1,10 @@
 import { RegisterPresenter } from './RegisterPresenter';
 import { drizzleRegistrationRepository } from '@/src/infrastructure/repositories/drizzle/DrizzleRegistrationRepository';
+import { drizzleEventRepository } from '@/src/infrastructure/repositories/drizzle/DrizzleEventRepository';
 
 export class RegisterPresenterServerFactory {
   static create(): RegisterPresenter {
-    return new RegisterPresenter(drizzleRegistrationRepository);
+    return new RegisterPresenter(drizzleRegistrationRepository, drizzleEventRepository);
   }
 }
 

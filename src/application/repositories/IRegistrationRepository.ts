@@ -11,10 +11,13 @@ export interface RegistrationData {
   targetGroup: string;
   address: string | null;
   note: string | null;
+  eventId: string | null;
 }
 
 export interface Registration extends RegistrationData {
   id: string;
+  eventId: string | null;
+  eventTitle?: string | null;
   status: string;
   createdAt: Date;
   updatedAt: Date;

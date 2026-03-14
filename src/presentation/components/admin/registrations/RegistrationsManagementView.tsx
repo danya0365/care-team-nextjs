@@ -1,21 +1,22 @@
 'use client';
 
-import { useManageRegisterPresenter } from '@/src/presentation/presenters/register/useManageRegisterPresenter';
-import { ManageRegisterViewModel } from '@/src/presentation/presenters/register/ManageRegisterPresenter';
+import { useRegistrationsPresenter } from '@/src/presentation/presenters/register/useRegistrationsPresenter';
+import { RegistrationsViewModel } from '@/src/presentation/presenters/register/RegistrationsPresenter';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
-import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle } from 'lucide-react';
+import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 import { useState } from 'react';
+import { cn } from '@/src/presentation/utils/cn';
 
-interface ManageRegisterViewProps {
-  initialViewModel?: ManageRegisterViewModel;
+interface RegistrationsManagementViewProps {
+  initialViewModel?: RegistrationsViewModel;
 }
 
-export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps) {
-  const { state, actions } = useManageRegisterPresenter(initialViewModel);
+export function RegistrationsManagementView({ initialViewModel }: RegistrationsManagementViewProps) {
+  const { state, actions } = useRegistrationsPresenter(initialViewModel);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const getStatusBadge = (status: string) => {
@@ -74,7 +75,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <AnimatedSection>
-          <div className="flex justify-end mb-6">
+          <div className="flex items-center justify-end gap-3 mb-6">
             <AnimatedButton 
               variant="outline"
               size="sm"
@@ -84,6 +85,17 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
               <RefreshCw className={`w-4 h-4 ${state.loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
               รีเฟรชข้อมูล
             </AnimatedButton>
+            
+            <a href="/admin/registrations/create">
+              <AnimatedButton 
+                variant="primary"
+                size="sm"
+                className="rounded-2xl shadow-lg shadow-primary/20 group"
+              >
+                <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                เพิ่มการลงทะเบียน
+              </AnimatedButton>
+            </a>
           </div>
 
           {/* Stats Grid */}
@@ -129,6 +141,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                   <thead>
                     <tr className="bg-primary/5 dark:bg-primary-dark/5 text-[10px] md:text-xs font-bold uppercase tracking-widest text-text-muted/80">
                       <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5">ข้อมูลผู้ลงทะเบียน</th>
+                      <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5">กิจกรรม / แคมเปญ</th>
                       <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5">กลุ่มเป้าหมาย</th>
                       <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5 text-center">สถานะ</th>
                       <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5 text-right">จัดการ</th>
@@ -141,13 +154,13 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                           <div className="font-bold text-text-primary dark:text-foreground group-hover:text-primary transition-colors text-base">{reg.name}</div>
                           <div className="text-sm text-text-secondary dark:text-text-muted flex flex-col gap-1.5 mt-2">
                              <div className="flex items-center gap-2">
-                               <div className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center"><RefreshCw className="w-3 h-3 opacity-70" /></div>
+                               <div className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center font-black text-[10px] text-primary">TEL</div>
                                {reg.phone}
                              </div>
-                             {reg.address && (
+                             {reg.email && (
                                <div className="flex items-center gap-2">
-                                 <div className="w-5 h-5 rounded-md bg-accent/5 flex items-center justify-center"><RefreshCw className="w-3 h-3 opacity-70" /></div>
-                                 {reg.address}
+                                 <div className="w-5 h-5 rounded-md bg-secondary/5 flex items-center justify-center font-black text-[10px] text-secondary">@</div>
+                                 {reg.email}
                                </div>
                              )}
                           </div>
@@ -158,6 +171,24 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                               <span className="text-primary not-italic font-bold ml-1">”</span>
                             </div>
                           )}
+                        </td>
+                        <td className="px-6 md:px-8 py-6">
+                          <div className="flex flex-col gap-1.5">
+                            <span className={cn(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border",
+                              reg.eventTitle 
+                                ? "bg-primary/5 text-primary border-primary/20" 
+                                : "bg-text-muted/5 text-text-muted border-text-muted/20"
+                            )}>
+                              <RefreshCw className={cn("w-3 h-3", reg.eventTitle && "animate-spin-slow")} />
+                              {reg.eventTitle || 'ไม่ระบุกิจกรรม'}
+                            </span>
+                            {reg.eventId && (
+                              <span className="text-[10px] text-text-muted font-medium pl-1">
+                                ID: {reg.eventId}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 md:px-8 py-6">
                           <span className="inline-flex px-3 py-1.5 rounded-lg bg-surface-elevated dark:bg-primary-dark/20 text-[10px] font-bold text-text-primary dark:text-foreground border border-border-light dark:border-white/5">
@@ -190,7 +221,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                               </button>
                             )}
                             <a
-                              href={`/admin/manage-register/edit/${reg.id}`}
+                              href={`/admin/registrations/edit/${reg.id}`}
                               className="w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/10"
                               title="แก้ไขข้อมูล"
                             >

@@ -13,7 +13,8 @@ import {
   Home,
   ShieldCheck,
   FileText,
-  LogOut
+  LogOut,
+  Calendar
 } from 'lucide-react';
 import { animated, useSpring } from '@react-spring/web';
 
@@ -69,7 +70,8 @@ export function AdminSidebar() {
 
   const navItems = [
     { label: 'ภาพรวมระบบ', href: '/admin', icon: BarChart3 },
-    { label: 'จัดการการลงทะเบียน', href: '/admin/manage-register', icon: Users },
+    { label: 'จัดการกิจกรรม', href: '/admin/events', icon: Calendar },
+    { label: 'จัดการการลงทะเบียน', href: '/admin/registrations', icon: Users },
     { label: 'ตั้งค่าระบบ', href: '#', icon: Settings },
   ];
 

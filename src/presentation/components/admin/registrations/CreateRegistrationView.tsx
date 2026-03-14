@@ -1,47 +1,48 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useEditRegistrationPresenter } from '@/src/presentation/presenters/register/useEditRegistrationPresenter';
-import { EditRegistrationViewModel } from '@/src/presentation/presenters/register/EditRegistrationPresenter';
+import { useState } from 'react';
+import { useCreateRegistrationPresenter } from '@/src/presentation/presenters/register/useCreateRegistrationPresenter';
+import { CreateRegistrationViewModel } from '@/src/presentation/presenters/register/CreateRegistrationPresenter';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 import { RegistrationData } from '@/src/application/repositories/IRegistrationRepository';
-import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, FileEdit, AlertCircle, Users } from 'lucide-react';
+import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, PlusCircle, AlertCircle, Users, Calendar } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 
-interface EditRegistrationViewProps {
-  id: string;
-  initialViewModel?: EditRegistrationViewModel;
+interface CreateRegistrationViewProps {
+  initialViewModel?: CreateRegistrationViewModel;
 }
 
-export function EditRegistrationView({ id, initialViewModel }: EditRegistrationViewProps) {
-  const { state, actions } = useEditRegistrationPresenter(id, initialViewModel);
+export function CreateRegistrationView({ initialViewModel }: CreateRegistrationViewProps) {
+  const { state, actions } = useCreateRegistrationPresenter(initialViewModel);
   
-  const [formData, setFormData] = useState<Partial<RegistrationData> & { status?: string }>({});
-  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
-
-  useEffect(() => {
-    if (state.viewModel?.registration) {
-      const { name, email, phone, targetGroup, address, note, status } = state.viewModel.registration;
-      setFormData({ name, email, phone, targetGroup, address, note, status });
-    }
-  }, [state.viewModel]);
+  const [formData, setFormData] = useState<RegistrationData>({
+    name: '',
+    email: '',
+    phone: '',
+    targetGroup: '',
+    address: '',
+    note: '',
+    eventId: '',
+  });
+  
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value || null }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSaveConfirm(true);
+    setShowConfirm(true);
   };
 
   const handleConfirmSave = async () => {
-    await actions.update(formData);
-    setShowSaveConfirm(false);
+    await actions.create(formData);
+    setShowConfirm(false);
   };
 
   if (state.loading && !state.viewModel) {
@@ -61,8 +62,8 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
   return (
     <div className="min-h-screen pb-20">
       <PageHeader
-        title={<><span className="gradient-text">แก้ไข</span>ข้อมูลผู้ลงทะเบียน</>}
-        description={`รหัสอ้างอิง: #${id.slice(0, 8).toUpperCase()}`}
+        title={<><span className="gradient-text">เพิ่ม</span>การลงทะเบียนใหม่</>}
+        description="กรอกข้อมูลเพื่อลงทะเบียนกลุ่มเป้าหมายเข้าร่วมกิจกรรมใหม่โดยผู้ดูแลระบบ"
         spacing="default"
       >
         <div className="mt-8">
@@ -86,18 +87,42 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                 <div className="w-24 h-24 bg-success/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 transform rotate-6 animate-pulse">
                   <CheckCircle2 className="w-12 h-12 text-success" />
                 </div>
-                <h2 className="text-3xl font-black text-text-primary dark:text-foreground mb-3">อัปเดตข้อมูลสำเร็จ</h2>
+                <h2 className="text-3xl font-black text-text-primary dark:text-foreground mb-3">บันทึกข้อมูลสำเร็จ</h2>
                 <p className="text-text-muted font-medium italic">ระบบกำลังพาคุณกลับไปยังหน้าจัดการการลงทะเบียน...</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="flex items-center gap-3 pb-4 border-b border-border-light dark:border-white/5">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <FileEdit className="w-5 h-5" />
+                    <PlusCircle className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-text-primary dark:text-foreground">ข้อมูลส่วนบุคคล</h3>
-                    <p className="text-xs text-text-muted">กรุณาตรวจสอบความถูกต้องของข้อมูลก่อนบันทึก</p>
+                    <h3 className="text-lg font-bold text-text-primary dark:text-foreground">ข้อมูลการลงทะเบียน</h3>
+                    <p className="text-xs text-text-muted">โปรดระบุข้อมูลให้ครบถ้วนเพื่อผลประโยชน์ของกลุ่มเป้าหมาย</p>
+                  </div>
+                </div>
+
+                {/* Event Selection */}
+                <div className="space-y-2">
+                  <label className={labelClasses}>
+                    <Calendar className="w-4 h-4 text-primary/60" /> กิจกรรม / แคมเปญ
+                  </label>
+                  <div className="relative">
+                    <select
+                      required
+                      name="eventId"
+                      value={formData.eventId || ''}
+                      onChange={handleChange}
+                      className={`${inputClasses} appearance-none cursor-pointer border-primary/30 dark:border-primary-light/20`}
+                    >
+                      <option value="" disabled className="dark:bg-background text-text-muted italic">--- กรุณาเลือกกิจกรรม ---</option>
+                      {state.viewModel?.events.map(event => (
+                        <option key={event.id} value={event.id} className="dark:bg-background">
+                          {event.title}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
                   </div>
                 </div>
 
@@ -110,7 +135,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                       required
                       type="text"
                       name="name"
-                      value={formData.name || ''}
+                      value={formData.name}
                       onChange={handleChange}
                       className={inputClasses}
                       placeholder="สมชาย ใจดี"
@@ -124,7 +149,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                       required
                       type="tel"
                       name="phone"
-                      value={formData.phone || ''}
+                      value={formData.phone}
                       onChange={handleChange}
                       className={inputClasses}
                       placeholder="08X-XXX-XXXX"
@@ -134,7 +159,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
 
                 <div className="space-y-2">
                   <label className={labelClasses}>
-                    <Mail className="w-4 h-4 text-primary/60" /> อีเมล
+                    <Mail className="w-4 h-4 text-primary/60" /> อีเมล (ถ้ามี)
                   </label>
                   <input
                     type="email"
@@ -146,45 +171,24 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className={labelClasses}>
-                      <Users className="w-4 h-4 text-primary/60" /> กลุ่มเป้าหมาย
-                    </label>
-                    <div className="relative">
-                      <select
-                        required
-                        name="targetGroup"
-                        value={formData.targetGroup || ''}
-                        onChange={handleChange}
-                        className={`${inputClasses} appearance-none cursor-pointer`}
-                      >
-                        {state.viewModel?.targetGroups.map(group => (
-                          <option key={group} value={group} className="dark:bg-background">{group}</option>
-                        ))}
-                      </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className={labelClasses}>
-                      <CheckCircle2 className="w-4 h-4 text-primary/60" /> สถานะการตรวจสอบ
-                    </label>
-                    <div className="relative">
-                      <select
-                        required
-                        name="status"
-                        value={formData.status || 'pending'}
-                        onChange={handleChange}
-                        className={`${inputClasses} appearance-none cursor-pointer font-bold`}
-                      >
-                        <option value="pending" className="dark:bg-background">🟡 รอดำเนินการ (Pending)</option>
-                        <option value="approved" className="dark:bg-background">🟢 อนุมัติแล้ว (Approved)</option>
-                        <option value="rejected" className="dark:bg-background">🔴 ปฏิเสธ (Rejected)</option>
-                      </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                    </div>
+                <div className="space-y-2">
+                  <label className={labelClasses}>
+                    <Users className="w-4 h-4 text-primary/60" /> กลุ่มเป้าหมาย
+                  </label>
+                  <div className="relative">
+                    <select
+                      required
+                      name="targetGroup"
+                      value={formData.targetGroup}
+                      onChange={handleChange}
+                      className={`${inputClasses} appearance-none cursor-pointer`}
+                    >
+                      <option value="" disabled className="dark:bg-background text-text-muted italic">--- เลือกกลุ่มเป้าหมาย ---</option>
+                      {state.viewModel?.targetGroups.map(group => (
+                        <option key={group} value={group} className="dark:bg-background font-medium">{group}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
                   </div>
                 </div>
 
@@ -217,9 +221,9 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                 </div>
 
                 {state.error && (
-                  <div className="p-5 bg-error/10 border border-error/20 text-error text-sm rounded-2xl flex items-center gap-3">
+                  <div className="p-5 bg-error/10 border border-error/20 text-error text-sm rounded-2xl flex items-center gap-3 animate-headShake">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <span>{state.error}</span>
+                    <span className="font-bold">{state.error}</span>
                   </div>
                 )}
 
@@ -247,7 +251,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                     ) : (
                       <>
                         <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                        บันทึกข้อมูล
+                        ยืนยันการลงทะเบียน
                       </>
                     )}
                   </AnimatedButton>
@@ -259,13 +263,13 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
       </div>
 
       <ConfirmModal
-        isOpen={showSaveConfirm}
-        onClose={() => setShowSaveConfirm(false)}
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
         onConfirm={handleConfirmSave}
-        title="ยืนยันการบันทึกข้อมูล"
-        message="คุณแน่ใจหรือไม่ว่าต้องการบันทึกการเปลี่ยนแปลงข้อมูลผู้ลงทะเบียนนี้?"
+        title="ยืนยันการลงทะเบียน"
+        message="คุณแน่ใจหรือไม่ว่าต้องการเพิ่มข้อมูลการลงทะเบียนใหม่นี้เข้าสู่ระบบ?"
         type="info"
-        confirmText="บันทึกข้อมูล"
+        confirmText="ยืนยันบันทึก"
         isLoading={state.submitting}
       />
     </div>

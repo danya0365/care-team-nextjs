@@ -1,5 +1,5 @@
 import { db } from '../../database/client';
-import { registrations } from '../../database/schema';
+import { registrations, events } from '../../database/schema';
 import {
   IRegistrationRepository,
   Registration,
@@ -32,12 +32,36 @@ export class DrizzleRegistrationRepository implements IRegistrationRepository {
   }
 
   async getAll(): Promise<Registration[]> {
-    return await db.select().from(registrations);
+    const result = await db
+      .select({
+        registration: registrations,
+        eventTitle: events.title,
+      })
+      .from(registrations)
+      .leftJoin(events, eq(registrations.eventId, events.id));
+
+    return result.map((row) => ({
+      ...row.registration,
+      eventTitle: row.eventTitle,
+    }));
   }
 
   async getById(id: string): Promise<Registration | null> {
-    const result = await db.select().from(registrations).where(eq(registrations.id, id));
-    return result[0] || null;
+    const result = await db
+      .select({
+        registration: registrations,
+        eventTitle: events.title,
+      })
+      .from(registrations)
+      .leftJoin(events, eq(registrations.eventId, events.id))
+      .where(eq(registrations.id, id));
+
+    if (result.length === 0) return null;
+
+    return {
+      ...result[0].registration,
+      eventTitle: result[0].eventTitle,
+    };
   }
 
   async updateStatus(id: string, status: string): Promise<Registration> {

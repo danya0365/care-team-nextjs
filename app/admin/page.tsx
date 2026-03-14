@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
     { 
       title: 'จัดการการลงทะเบียน', 
       desc: 'เข้าสู่อาณาจักรการบริหารจัดการข้อมูลผู้ขอรับบริการ', 
-      href: '/admin/manage-register', 
+      href: '/admin/registrations', 
       icon: <ClipboardList className="w-6 h-6" />,
       color: 'primary' 
     },

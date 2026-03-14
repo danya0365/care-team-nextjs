@@ -6,12 +6,16 @@ import { AnimatedButton } from '@/src/presentation/components/common/AnimatedBut
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { useRegisterPresenter } from '@/src/presentation/presenters/register/useRegisterPresenter';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 
-export function RegisterView() {
-  const [state, actions] = useRegisterPresenter();
+interface RegisterViewProps {
+  eventId?: string;
+}
+
+export function RegisterView({ eventId }: RegisterViewProps) {
+  const [state, actions] = useRegisterPresenter(eventId);
   
   const [formData, setFormData] = useState<RegistrationData>({
     name: '',
@@ -20,6 +24,7 @@ export function RegisterView() {
     targetGroup: '',
     address: null,
     note: null,
+    eventId: eventId || null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -48,13 +53,17 @@ export function RegisterView() {
             </h2>
             
             <p className="text-lg text-text-secondary dark:text-text-muted mb-8 italic">
-              ขอบคุณสำหรับการแจ้งความประสงค์เข้าร่วมโครงการ ทีมงาน <span className="text-primary font-bold">{siteConfig.name}</span> จะติดต่อกลับไปหาคุณโดยเร็วที่สุดผ่านช่องทางที่คุณระบุไว้
+              ขอบคุณสำหรับการแจ้งความประสงค์เข้าร่วมกิจกรรมกับทีมงาน <span className="text-primary font-bold">{siteConfig.name}</span> ผ่านกิจกรรม <span className="text-primary font-bold">{state.eventTitle || 'กิจกรรมของเรา'}</span> ทางเราจะติดต่อกลับไปหาคุณโดยเร็วที่สุด
             </p>
             
             <div className="bg-surface-elevated dark:bg-primary-dark/20 p-8 rounded-[2rem] mb-10 text-left border border-border-light dark:border-card-border relative group overflow-hidden">
                <div className="absolute top-0 left-0 w-1 h-full bg-success group-hover:w-2 transition-all" />
                <h4 className="text-xs font-black text-success uppercase tracking-[0.2em] mb-4">ข้อมูลการลงทะเบียนของคุณ</h4>
                <div className="space-y-4">
+                 <p className="flex justify-between items-center text-sm">
+                   <span className="text-text-muted font-bold">กิจกรรม:</span> 
+                   <span className="text-text-primary dark:text-foreground font-black text-right">{state.eventTitle || 'ทั่วไป'}</span>
+                 </p>
                  <p className="flex justify-between items-center">
                    <span className="text-text-muted font-bold text-sm">เลขที่อ้างอิง:</span> 
                    <span className="font-mono bg-success/10 px-3 py-1 rounded-lg text-success font-black tracking-wider">
@@ -84,12 +93,17 @@ export function RegisterView() {
       <div className="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
 
       <PageHeader
-        badgeText="Step into our community"
-        title={<>ลงทะเบียน <span className="gradient-text">เข้าร่วมโครงการ</span></>}
-        description={<>
-          เราพร้อมให้การสนับสนุนและดูแลกลุ่มประชากรที่เปราะบางด้วยความเข้าใจ 
-          เพื่อสร้างคุณภาพชีวิตที่ดีขึ้นอย่างเท่าเทียมและยั่งยืน
-        </>}
+        badgeText={state.eventTitle ? "Registration Open" : "Step into our community"}
+        title={
+          <>
+            {state.eventTitle || 'ลงทะเบียน'} <span className="gradient-text">เข้าร่วมโครงการ</span>
+          </>
+        }
+        description={
+          state.eventTitle 
+            ? `แบบฟอร์มลงทะเบียนแจ้งความประสงค์เข้าร่วมกิจกรรม "${state.eventTitle}" ทีมงานพร้อมดูแลและให้คำปรึกษาด้วยความเข้าใจ`
+            : "เราพร้อมให้การสนับสนุนและดูแลกลุ่มประชากรที่เปราะบางด้วยความเข้าใจ เพื่อสร้างคุณภาพชีวิตที่ดีขึ้นอย่างเท่าเทียมและยั่งยืน"
+        }
         spacing="large"
       />
 

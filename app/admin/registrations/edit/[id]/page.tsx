@@ -1,4 +1,4 @@
-import { EditRegistrationView } from '@/src/presentation/components/register/EditRegistrationView';
+import { EditRegistrationView } from '@/src/presentation/components/admin/registrations/EditRegistrationView';
 import { createServerEditRegistrationPresenter } from '@/src/presentation/presenters/register/EditRegistrationPresenterServerFactory';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';

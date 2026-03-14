@@ -6,13 +6,30 @@ import {
 import { Metadata } from 'next';
 import { siteConfig } from '@/src/config/site';
 
+import {
+  IEventRepository,
+  Event
+} from '@/src/application/repositories/IEventRepository';
+
 /**
  * RegisterPresenter
  * Handles business logic for the Registration page
  * Following Clean Architecture - Presentation layer
  */
 export class RegisterPresenter {
-  constructor(private readonly registrationRepository: IRegistrationRepository) {}
+  constructor(
+    private readonly registrationRepository: IRegistrationRepository,
+    private readonly eventRepository: IEventRepository
+  ) {}
+
+  async getEventById(id: string): Promise<Event | null> {
+    try {
+      return await this.eventRepository.getById(id);
+    } catch (error) {
+      console.error('Error getting event details:', error);
+      return null;
+    }
+  }
 
   async submitRegistration(data: RegistrationData): Promise<Registration> {
     // Basic validation

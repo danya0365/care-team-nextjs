@@ -20,7 +20,6 @@ const navLinks = [
   { name: 'เกี่ยวกับเรา', href: '/about', icon: Info },
   { name: 'บริการ', href: '/services', icon: Briefcase },
   { name: 'ติดต่อเรา', href: '/contact', icon: Mail },
-  { name: 'ลงทะเบียน', href: '/register', icon: UserPlus },
   { name: 'จัดการ', href: '/admin', icon: ShieldCheck },
 ];
 

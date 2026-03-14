@@ -4,7 +4,7 @@ import {
 } from '@/src/application/repositories/IRegistrationRepository';
 import { Metadata } from 'next';
 
-export interface ManageRegisterViewModel {
+export interface RegistrationsViewModel {
   registrations: Registration[];
   stats: {
     total: number;
@@ -19,10 +19,10 @@ export interface ManageRegisterViewModel {
  * Handles business logic for the Registration Management page
  * Following Clean Architecture - Presentation layer
  */
-export class ManageRegisterPresenter {
+export class RegistrationsPresenter {
   constructor(private repository: IRegistrationRepository) {}
 
-  async getViewModel(): Promise<ManageRegisterViewModel> {
+  async getViewModel(): Promise<RegistrationsViewModel> {
     const list = await this.repository.getAll();
     
     // Sort by latest first

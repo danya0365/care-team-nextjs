@@ -1,6 +1,7 @@
 'use client';
 
 import { ApiRegistrationRepository } from '@/src/infrastructure/repositories/api/ApiRegistrationRepository';
+import { ApiEventRepository } from '@/src/infrastructure/repositories/api/ApiEventRepository';
 import { RegisterPresenter } from './RegisterPresenter';
 
 /**
@@ -11,8 +12,9 @@ import { RegisterPresenter } from './RegisterPresenter';
  */
 export class RegisterPresenterClientFactory {
   static create(): RegisterPresenter {
-    const repository = new ApiRegistrationRepository();
-    return new RegisterPresenter(repository);
+    const registrationRepo = new ApiRegistrationRepository();
+    const eventRepo = new ApiEventRepository();
+    return new RegisterPresenter(registrationRepo, eventRepo);
   }
 }
 

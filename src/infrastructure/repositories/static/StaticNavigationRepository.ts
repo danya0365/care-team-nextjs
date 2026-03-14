@@ -64,9 +64,9 @@ const FOOTER_MENU: NavigationItem[] = [
     href: '/register',
   },
   {
-    id: 'manage-register',
+    id: 'registrations',
     label: 'จัดการการลงทะเบียน',
-    href: '/manage-register',
+    href: '/admin/registrations',
   },
   {
     id: 'facebook',
