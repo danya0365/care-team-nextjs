@@ -9,6 +9,7 @@ import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard'
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 import { RegistrationData } from '@/src/application/repositories/IRegistrationRepository';
 import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, FileEdit, AlertCircle, Users } from 'lucide-react';
+import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 
 interface EditRegistrationViewProps {
   id: string;
@@ -19,6 +20,7 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
   const { state, actions } = useEditRegistrationPresenter(id, initialViewModel);
   
   const [formData, setFormData] = useState<Partial<RegistrationData> & { status?: string }>({});
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
   useEffect(() => {
     if (state.viewModel?.registration) {
@@ -34,7 +36,12 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowSaveConfirm(true);
+  };
+
+  const handleConfirmSave = async () => {
     await actions.update(formData);
+    setShowSaveConfirm(false);
   };
 
   if (state.loading && !state.viewModel) {
@@ -250,6 +257,17 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
           </AnimatedCard>
         </AnimatedSection>
       </div>
+
+      <ConfirmModal
+        isOpen={showSaveConfirm}
+        onClose={() => setShowSaveConfirm(false)}
+        onConfirm={handleConfirmSave}
+        title="ยืนยันการบันทึกข้อมูล"
+        message="คุณแน่ใจหรือไม่ว่าต้องการบันทึกการเปลี่ยนแปลงข้อมูลผู้ลงทะเบียนนี้?"
+        type="info"
+        confirmText="บันทึกข้อมูล"
+        isLoading={state.submitting}
+      />
     </div>
   );
 }

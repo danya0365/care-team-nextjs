@@ -6,7 +6,9 @@ import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSe
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
-import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle } from 'lucide-react';
+import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
+import { useState } from 'react';
 
 interface ManageRegisterViewProps {
   initialViewModel?: ManageRegisterViewModel;
@@ -14,6 +16,7 @@ interface ManageRegisterViewProps {
 
 export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps) {
   const { state, actions } = useManageRegisterPresenter(initialViewModel);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -194,7 +197,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                               <Edit className="w-4 h-4" />
                             </a>
                             <button
-                              onClick={() => actions.deleteRegistration(reg.id)}
+                              onClick={() => setDeleteId(reg.id)}
                               disabled={state.actionLoading === reg.id}
                               className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
                               title="ลบ"
@@ -212,6 +215,22 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
           </AnimatedCard>
         </AnimatedSection>
       </div>
+
+      <ConfirmModal
+        isOpen={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            await actions.deleteRegistration(deleteId);
+            setDeleteId(null);
+          }
+        }}
+        title="ยืนยันการลบข้อมูล"
+        message="คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลการลงทะเบียนนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้"
+        type="danger"
+        confirmText="ยืนยันการลบ"
+        isLoading={state.actionLoading === deleteId}
+      />
     </div>
   );
 }
