@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@/src/presentation/utils/cn';
+import { useAuthPresenter } from '@/src/presentation/presenters/auth/useAuthPresenter';
 import { 
   BarChart3, 
   Users, 
@@ -62,6 +63,7 @@ export function AdminSidebar() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { state, actions } = useAuthPresenter();
 
   // Close mobile sidebar on route change
   useEffect(() => {
@@ -155,13 +157,19 @@ export function AdminSidebar() {
               isCollapsed={isCollapsed}
             />
             <button
+              onClick={actions.logout}
+              disabled={state.loading}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-error hover:bg-error/10 transition-all duration-300 group",
+                "w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-error hover:bg-error/10 transition-all duration-300 group disabled:opacity-50",
                 isCollapsed ? "justify-center" : ""
               )}
             >
-              <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              {!isCollapsed && <span className="font-bold text-sm tracking-wide">ออกจากระบบ</span>}
+              <LogOut className={cn("w-5 h-5 group-hover:-translate-x-1 transition-transform", state.loading && "animate-pulse")} />
+              {!isCollapsed && (
+                <span className="font-bold text-sm tracking-wide">
+                  {state.loading ? 'กำลังออก...' : 'ออกจากระบบ'}
+                </span>
+              )}
             </button>
           </div>
         </div>

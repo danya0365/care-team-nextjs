@@ -10,7 +10,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:setup": "yarn db:push && yarn seed:starter",
+    "db:studio": "drizzle-kit studio",
+    "seed:starter": "tsx --env-file=.env.local src/infrastructure/database/seeds/starter.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -28,6 +30,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-spring": "^10.0.3",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.5.0",
     "uuid": "^13.0.0",
     "zustand": "^5.0.11"
