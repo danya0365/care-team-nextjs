@@ -89,15 +89,15 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
             {[
-              { label: 'ลงทะเบียนทั้งหมด', value: stats.total, color: 'primary', icon: <Users /> },
-              { label: 'รอดำเนินการ', value: stats.pending, color: 'warning', icon: <Clock /> },
-              { label: 'อนุมัติแล้ว', value: stats.approved, color: 'success', icon: <CheckCircle /> },
-              { label: 'ปฏิเสธข้อมูล', value: stats.rejected, color: 'error', icon: <XCircle /> },
+              { label: 'ลงทะเบียนทั้งหมด', value: stats.total, icon: <Users />, colorClass: 'text-primary', bgClass: 'bg-primary/10', circleBg: 'bg-primary' },
+              { label: 'รอดำเนินการ', value: stats.pending, icon: <Clock />, colorClass: 'text-warning', bgClass: 'bg-warning/10', circleBg: 'bg-warning' },
+              { label: 'อนุมัติแล้ว', value: stats.approved, icon: <CheckCircle />, colorClass: 'text-success', bgClass: 'bg-success/10', circleBg: 'bg-success' },
+              { label: 'ปฏิเสธข้อมูล', value: stats.rejected, icon: <XCircle />, colorClass: 'text-error', bgClass: 'bg-error/10', circleBg: 'bg-error' },
             ].map((stat, i) => (
               <AnimatedCard key={i} className="relative group overflow-hidden p-6 md:p-8">
-                <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 bg-${stat.color} group-hover:scale-110 transition-transform duration-500`} />
+                <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 ${stat.circleBg} group-hover:scale-110 transition-transform duration-500`} />
                 <div className="flex flex-col gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-${stat.color}/10 text-${stat.color}`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${stat.bgClass} ${stat.colorClass}`}>
                     {stat.icon}
                   </div>
                   <div>
