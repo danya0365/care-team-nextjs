@@ -5,6 +5,8 @@ import { ServicesViewModel } from '@/src/presentation/presenters/services/Servic
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 
+import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+
 interface ServicesViewProps {
   initialViewModel?: ServicesViewModel;
 }
@@ -29,29 +31,12 @@ export function ServicesView({ initialViewModel }: ServicesViewProps) {
       <div className="fixed top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Header Section with Gradient like HomeView */}
-      <section 
-        className="relative py-20 md:py-32"
-        style={{
-          background: 'linear-gradient(to bottom, var(--gradient-hero-from), var(--gradient-hero-to))',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <AnimatedSection>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-dark/20 text-primary dark:text-primary-light text-sm font-medium mb-6">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              Comprehensive Care Pipeline
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary dark:text-foreground mb-6 leading-tight">
-              บริการและ <span className="gradient-text">กระบวนการดูแล</span>
-            </h1>
-            <p className="text-lg text-text-secondary dark:text-text-muted max-w-3xl mx-auto leading-relaxed">
-              เราให้ความสำคัญกับการดูแลสุขภาพและสังคมด้วยกระบวนการที่มีมาตรฐาน
-              และสอดคล้องกับหลักการลดอันตรายจากการใช้สารเสพติด (Harm Reduction)
-            </p>
-          </AnimatedSection>
-        </div>
-      </section>
+      <PageHeader
+        badgeText="Comprehensive Care Pipeline"
+        title={<>บริการและ <span className="gradient-text">กระบวนการดูแล</span></>}
+        description="เราให้ความสำคัญกับการดูแลสุขภาพและสังคมด้วยกระบวนการที่มีมาตรฐาน และสอดคล้องกับหลักการลดอันตรายจากการใช้สารเสพติด (Harm Reduction)"
+        spacing="large"
+      />
 
       {/* RRTTPR Pipeline Section */}
       <section className="mt-16 overflow-hidden">

@@ -6,6 +6,8 @@ import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSe
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 
+import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+
 interface ContactViewProps {
   initialViewModel?: ContactViewModel;
 }
@@ -30,29 +32,12 @@ export function ContactView({ initialViewModel }: ContactViewProps) {
       <div className="fixed top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-accent/5 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Header Section with Gradient */}
-      <section 
-        className="relative py-20 md:py-32"
-        style={{
-          background: 'linear-gradient(to bottom, var(--gradient-hero-from), var(--gradient-hero-to))',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <AnimatedSection>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-dark/20 text-primary dark:text-primary-light text-sm font-medium mb-6">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              Contact Support 24/7
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary dark:text-foreground mb-6 leading-tight">
-              ติดต่อ <span className="gradient-text">สอบถามข้อมูล</span>
-            </h1>
-            <p className="text-lg text-text-secondary dark:text-text-muted max-w-3xl mx-auto leading-relaxed">
-              ทีมงานของเราพร้อมให้คำปรึกษาและช่วยเหลือคุณตลอดเวลา 
-              ติดต่อเราได้ผ่านช่องทางต่างๆ ด้านล่างนี้
-            </p>
-          </AnimatedSection>
-        </div>
-      </section>
+      <PageHeader
+        badgeText="Contact Support 24/7"
+        title={<>ติดต่อ <span className="gradient-text">สอบถามข้อมูล</span></>}
+        description="ทีมงานของเราพร้อมให้คำปรึกษาและช่วยเหลือคุณตลอดเวลา ติดต่อเราได้ผ่านช่องทางต่างๆ ด้านล่างนี้"
+        spacing="large"
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
