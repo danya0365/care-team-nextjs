@@ -1,8 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { security } from '@/src/infrastructure/utils/security';
-import { drizzleAuthRepository } from '@/src/infrastructure/repositories/drizzle/DrizzleAuthRepository';
+import { createServerAuthPresenter } from '@/src/presentation/presenters/auth/AuthPresenterServerFactory';
 
 /**
  * Server Action to retrieve the current session data
@@ -15,16 +14,16 @@ export async function getSessionAction() {
     
     if (!token) return null;
 
-    const payload = await security.verifyToken(token);
-    if (!payload || !payload.userId) return null;
-
-    const profile = await drizzleAuthRepository.getProfileByUserId(payload.userId);
+    const presenter = createServerAuthPresenter();
+    const profile = await presenter.getCurrentUser(token);
+    
     if (!profile) return null;
 
     return {
       user: {
-        id: payload.userId,
-        email: payload.email,
+        id: profile.userId,
+        email: profile.email,
+        name: profile.name,
       },
       activeProfile: profile,
     };

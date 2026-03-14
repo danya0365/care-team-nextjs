@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { AuthViewModel } from './AuthPresenter';
-import { apiAuthRepository } from '@/src/infrastructure/repositories/api/ApiAuthRepository';
+import { createClientAuthPresenter } from './AuthPresenterClientFactory';
 import { logoutAction } from '@/src/presentation/actions/authActions';
 
 export function useAuthPresenter() {
@@ -11,10 +11,13 @@ export function useAuthPresenter() {
     error: null,
   });
 
+  // ✅ Create presenter using factory
+  const presenter = useMemo(() => createClientAuthPresenter(), []);
+
   const checkSession = useCallback(async () => {
     setState(s => ({ ...s, loading: true }));
     try {
-      const profile = await apiAuthRepository.getProfileByUserId(''); // API route ignores the ID and returns current session
+      const profile = await presenter.getCurrentUser();
       if (profile) {
         setState({
           user: profile,
@@ -28,7 +31,7 @@ export function useAuthPresenter() {
     } catch (error) {
       setState(s => ({ ...s, authenticated: false, user: null, loading: false }));
     }
-  }, []);
+  }, [presenter]);
 
   useEffect(() => {
     checkSession();
@@ -37,7 +40,7 @@ export function useAuthPresenter() {
   const login = async (email: string, password: string) => {
     setState(s => ({ ...s, loading: true, error: null }));
     try {
-      const profile = await apiAuthRepository.login(email, password);
+      const profile = await presenter.login(email, password);
 
       if (profile) {
         setState({

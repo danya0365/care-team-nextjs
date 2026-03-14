@@ -1,7 +1,7 @@
-import { 
-  AuthUser, 
-  AuthenticatedUser, 
-  IAuthRepository 
+import {
+  AuthenticatedUser,
+  IAuthRepository,
+  RegisterData
 } from '@/src/application/repositories/IAuthRepository';
 
 /**
@@ -10,22 +10,22 @@ import {
  * Suitable for client-side use
  */
 export class ApiAuthRepository implements IAuthRepository {
-  async findByEmail(email: string): Promise<AuthUser | null> {
-    // This is typically not needed on the client for security reasons
-    // but we implement it for interface compatibility
-    throw new Error('findByEmail is not supported on the client side API repository.');
-  }
+  constructor() {}
 
-  async getProfileByUserId(userId: string): Promise<AuthenticatedUser | null> {
-    try {
-      const response = await fetch('/api/auth/me');
-      if (!response.ok) return null;
-      const data = await response.json();
-      return data.user as AuthenticatedUser;
-    } catch (error) {
-      console.error('Error fetching profile from API:', error);
-      return null;
+  async register(data: RegisterData): Promise<AuthenticatedUser> {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Registration failed');
     }
+
+    const result = await response.json();
+    return result.user as AuthenticatedUser;
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {
@@ -52,6 +52,37 @@ export class ApiAuthRepository implements IAuthRepository {
     const data = await response.json();
     return data.user as AuthenticatedUser;
   }
-}
 
-export const apiAuthRepository = new ApiAuthRepository();
+  async getCurrentUser(token?: string): Promise<AuthenticatedUser | null> {
+    try {
+      // On the client, we don't need the token string because it's in the HttpOnly cookie.
+      const response = await fetch('/api/auth/me');
+      if (!response.ok) return null;
+      const data = await response.json();
+      return data.user as AuthenticatedUser;
+    } catch (error) {
+      console.error('Error fetching current user from API:', error);
+      return null;
+    }
+  }
+
+  async saveSession(userId: string, token: string, expiresAt: Date): Promise<void> {
+    // Session saving is handled by the server during login
+    // This is a no-op on the client side
+  }
+
+  async logout(token?: string): Promise<void> {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
+  }
+}

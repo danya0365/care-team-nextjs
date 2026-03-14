@@ -21,6 +21,18 @@ export const authUsers = sqliteTable('auth_users', {
 });
 
 /**
+ * 2. Auth Sessions
+ * Track active user sessions for server-side invalidation
+ */
+export const authSessions = sqliteTable('auth_sessions', {
+  id: text('id').primaryKey(), // UUID or session token
+  userId: text('user_id').notNull().references(() => authUsers.id, { onDelete: 'cascade' }),
+  token: text('token').notNull(),
+  expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+  ...timestamps,
+});
+
+/**
  * 2. Roles
  * Group-level identity (e.g., admin, manager, member)
  */

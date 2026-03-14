@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthPresenter } from '@/src/presentation/presenters/auth/AuthPresenter';
-import { drizzleAuthRepository } from '@/src/infrastructure/repositories/drizzle/DrizzleAuthRepository';
+import { createServerAuthPresenter } from '@/src/presentation/presenters/auth/AuthPresenterServerFactory';
 
-const presenter = new AuthPresenter(drizzleAuthRepository);
+const presenter = createServerAuthPresenter();
 
 export async function GET(request: NextRequest) {
   try {

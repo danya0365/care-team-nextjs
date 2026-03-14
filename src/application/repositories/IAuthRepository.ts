@@ -21,19 +21,42 @@ export interface AuthenticatedUser extends UserProfile {
   roleName: string;
 }
 
+export interface RegisterData {
+  email: string;
+  name: string;
+  password?: string;
+}
+
 export interface IAuthRepository {
   /**
-   * Find an auth user by their email address
+   * Register a new user
    */
-  findByEmail(email: string): Promise<AuthUser | null>;
-
-  /**
-   * Get the profile for a specific user ID
-   */
-  getProfileByUserId(userId: string): Promise<AuthenticatedUser | null>;
+  register(data: RegisterData): Promise<AuthenticatedUser>;
 
   /**
    * Update a user's password
    */
   updatePassword(userId: string, passwordHash: string): Promise<void>;
+
+  /**
+   * Login with email and password
+   * Returns the authenticated user profile
+   */
+  login(email: string, password: string): Promise<AuthenticatedUser | null>;
+
+  /**
+   * Get the current authenticated user profile
+   * On server, this uses the token. On client, it can fetch from API.
+   */
+  getCurrentUser(token?: string): Promise<AuthenticatedUser | null>;
+
+  /**
+   * Save a new session token to the database
+   */
+  saveSession(userId: string, token: string, expiresAt: Date): Promise<void>;
+
+  /**
+   * Logout the user by invalidating their session token
+   */
+  logout(token?: string): Promise<void>;
 }
