@@ -3,6 +3,10 @@
 import { useManageRegisterPresenter } from '@/src/presentation/presenters/register/useManageRegisterPresenter';
 import { ManageRegisterViewModel } from '@/src/presentation/presenters/register/ManageRegisterPresenter';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
+import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
+import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
+import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText } from 'lucide-react';
 
 interface ManageRegisterViewProps {
   initialViewModel?: ManageRegisterViewModel;
@@ -14,18 +18,36 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-success-50 text-success dark:bg-success/20">อนุมัติแล้ว</span>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-success/10 text-success border border-success/20">
+            <CheckCircle className="w-3 h-3" />
+            อนุมัติแล้ว
+          </span>
+        );
       case 'rejected':
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-error-50 text-error dark:bg-error/20">ปฏิเสธ</span>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-error/10 text-error border border-error/20">
+            <XCircle className="w-3 h-3" />
+            ปฏิเสธ
+          </span>
+        );
       default:
-        return <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-warning-50 text-warning dark:bg-warning/20">รอดำเนินการ</span>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-warning/10 text-warning border border-warning/20">
+            <Clock className="w-3 h-3" />
+            รอดำเนินการ
+          </span>
+        );
     }
   };
 
   if (state.loading && !state.viewModel) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-sm font-bold text-text-muted animate-pulse">กำลังโหลดข้อมูล...</p>
+        </div>
       </div>
     );
   }
@@ -33,79 +55,68 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
   const { registrations, stats } = state.viewModel || { registrations: [], stats: { total: 0, pending: 0, approved: 0, rejected: 0 } };
 
   return (
-    <div className="min-h-screen pb-20 overflow-hidden">
-      {/* Background patterns like HomeView */}
-      <div className="fixed inset-0 -z-10 bg-surface dark:bg-background pointer-events-none" />
-      <div className="fixed top-0 right-0 -z-10 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-      <div className="fixed bottom-0 left-0 -z-10 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[120px] pointer-events-none" />
-
-      {/* Header Section with Gradient */}
-      <section className="relative pt-24 pb-12 mb-8" style={{ background: 'linear-gradient(to bottom, var(--gradient-hero-from), transparent)' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-dark/20 text-primary dark:text-primary-light text-xs font-bold mb-4">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  Admin Panel • สิทธิเฉพาะทีมงานเท่านั้น
-                </div>
-                <h1 className="text-4xl md:text-5xl font-black text-text-primary dark:text-foreground leading-tight">
-                  <span className="gradient-text">จัดการ</span>การลงทะเบียน
-                </h1>
-                <p className="text-lg text-text-secondary dark:text-text-muted mt-3 max-w-2xl">
-                  ตรวจสอบและบริหารจัดการข้อมูลผู้ลงทะเบียน เพื่อการประสานงานที่มีประสิทธิภาพ
-                </p>
-              </div>
-              
-              <button 
-                onClick={() => actions.refresh()}
-                className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-card-bg border border-border-light dark:border-card-border rounded-2xl text-sm font-bold shadow-soft hover:shadow-elevated hover:-translate-y-1 transition-all"
-              >
-                <svg className={`w-4 h-4 ${state.loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                รีเฟรชข้อมูล
-              </button>
-            </div>
-          </AnimatedSection>
+    <div className="min-h-screen pb-20">
+      <PageHeader
+        title={<><span className="gradient-text">จัดการ</span>การลงทะเบียน</>}
+        description="ตรวจสอบและบริหารจัดการข้อมูลผู้ลงทะเบียน เพื่อการประสานงานที่มีประสิทธิภาพและเป็นระบบ"
+        spacing="large"
+      >
+        <div className="mt-8 flex justify-center md:justify-start">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary dark:text-primary-light text-xs font-bold shadow-sm backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            Admin Panel • สิทธิเฉพาะทีมงานเท่านั้น
+          </div>
         </div>
-      </section>
+      </PageHeader>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatedSection delay={100}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+        <AnimatedSection>
+          <div className="flex justify-end mb-6">
+            <AnimatedButton 
+              variant="outline"
+              size="sm"
+              onClick={() => actions.refresh()}
+              className="bg-white/50 dark:bg-card-bg/50 backdrop-blur-md rounded-2xl group"
+            >
+              <RefreshCw className={`w-4 h-4 ${state.loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+              รีเฟรชข้อมูล
+            </AnimatedButton>
+          </div>
+
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
             {[
-              { label: 'ลงทะเบียนทั้งหมด', value: stats.total, color: 'primary', icon: '🫂' },
-              { label: 'รอดำเนินการ', value: stats.pending, color: 'warning', icon: '⏳' },
-              { label: 'อนุมัติแล้ว', value: stats.approved, color: 'success', icon: '✅' },
-              { label: 'ปฏิเสธข้อมูล', value: stats.rejected, color: 'error', icon: '❌' },
+              { label: 'ลงทะเบียนทั้งหมด', value: stats.total, color: 'primary', icon: <Users /> },
+              { label: 'รอดำเนินการ', value: stats.pending, color: 'warning', icon: <Clock /> },
+              { label: 'อนุมัติแล้ว', value: stats.approved, color: 'success', icon: <CheckCircle /> },
+              { label: 'ปฏิเสธข้อมูล', value: stats.rejected, color: 'error', icon: <XCircle /> },
             ].map((stat, i) => (
-              <div key={i} className="group p-6 rounded-[2rem] bg-white dark:bg-card-bg border border-border-light dark:border-card-border shadow-soft hover:shadow-elevated transition-all flex flex-col gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-${stat.color}-50 dark:bg-${stat.color}/10 text-${stat.color}`}>
-                  {stat.icon}
+              <AnimatedCard key={i} className="relative group overflow-hidden p-6 md:p-8">
+                <div className={`absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-5 bg-${stat.color} group-hover:scale-110 transition-transform duration-500`} />
+                <div className="flex flex-col gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl bg-${stat.color}/10 text-${stat.color}`}>
+                    {stat.icon}
+                  </div>
+                  <div>
+                    <div className="text-[10px] md:text-xs font-bold text-text-muted uppercase tracking-widest mb-1">{stat.label}</div>
+                    <div className="text-2xl md:text-3xl font-black text-text-primary dark:text-foreground">{stat.value}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-text-muted uppercase tracking-wider mb-1">{stat.label}</div>
-                  <div className="text-3xl font-black text-text-primary dark:text-foreground">{stat.value}</div>
-                </div>
-              </div>
+              </AnimatedCard>
             ))}
           </div>
         </AnimatedSection>
 
-        {/* Registration Table/Mobile List */}
+        {/* Registration Table/Content */}
         <AnimatedSection delay={200}>
-          <div className="bg-white/80 dark:bg-card-bg/80 backdrop-blur-xl rounded-[2.5rem] border border-border-light dark:border-card-border shadow-soft overflow-hidden">
+          <AnimatedCard className="overflow-hidden p-0">
             {registrations.length === 0 ? (
-              <div className="p-24 text-center">
-                <div className="w-20 h-20 bg-primary-50 dark:bg-primary-dark/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-primary/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+              <div className="p-16 md:p-24 text-center">
+                <div className="w-20 h-20 bg-primary/5 dark:bg-primary-dark/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                  <FileText className="w-10 h-10 text-primary/30" />
                 </div>
                 <h3 className="text-xl font-bold text-text-primary dark:text-foreground">ยังไม่มีข้อมูลการลงทะเบียน</h3>
-                <p className="text-text-muted mt-2 max-w-sm mx-auto">
+                <p className="text-text-muted mt-2 max-w-sm mx-auto text-sm">
                   เมื่อมีกลุ่มเป้าหมายส่งข้อมูลผ่านหน้าลงทะเบียน ข้อมูลทั้งหมดจะปรากฏขึ้นที่ตารางจัดการนี้
                 </p>
               </div>
@@ -113,88 +124,82 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-primary-50/50 dark:bg-primary-dark/5 text-xs font-bold uppercase tracking-widest text-text-muted">
-                      <th className="px-8 py-5 border-b border-border-light dark:border-card-border">ข้อมูลผู้ลงทะเบียน</th>
-                      <th className="px-8 py-5 border-b border-border-light dark:border-card-border">กลุ่มเป้าหมาย</th>
-                      <th className="px-8 py-5 border-b border-border-light dark:border-card-border text-center">สถานะ</th>
-                      <th className="px-8 py-5 border-b border-border-light dark:border-card-border text-right">จัดการ</th>
+                    <tr className="bg-primary/5 dark:bg-primary-dark/5 text-[10px] md:text-xs font-bold uppercase tracking-widest text-text-muted/80">
+                      <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5">ข้อมูลผู้ลงทะเบียน</th>
+                      <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5">กลุ่มเป้าหมาย</th>
+                      <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5 text-center">สถานะ</th>
+                      <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5 text-right">จัดการ</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border-light dark:divide-card-border">
+                  <tbody className="divide-y divide-border-light dark:divide-white/5">
                     {registrations.map((reg) => (
-                      <tr key={reg.id} className="hover:bg-primary-50/20 dark:hover:bg-primary-dark/5 transition-colors group">
-                        <td className="px-8 py-5">
-                          <div className="font-bold text-text-primary dark:text-foreground group-hover:text-primary transition-colors">{reg.name}</div>
-                          <div className="text-sm text-text-secondary dark:text-text-muted flex flex-col gap-0.5 mt-1">
-                            <span className="flex items-center gap-2">
-                              <svg className="w-3.5 h-3.5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                              {reg.phone}
-                            </span>
-                            {reg.address && (
-                              <span className="flex items-center gap-2">
-                                <svg className="w-3.5 h-3.5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                {reg.address}
-                              </span>
-                            )}
+                      <tr key={reg.id} className="hover:bg-primary/5 dark:hover:bg-primary-dark/5 transition-colors group">
+                        <td className="px-6 md:px-8 py-6">
+                          <div className="font-bold text-text-primary dark:text-foreground group-hover:text-primary transition-colors text-base">{reg.name}</div>
+                          <div className="text-sm text-text-secondary dark:text-text-muted flex flex-col gap-1.5 mt-2">
+                             <div className="flex items-center gap-2">
+                               <div className="w-5 h-5 rounded-md bg-primary/5 flex items-center justify-center"><RefreshCw className="w-3 h-3 opacity-70" /></div>
+                               {reg.phone}
+                             </div>
+                             {reg.address && (
+                               <div className="flex items-center gap-2">
+                                 <div className="w-5 h-5 rounded-md bg-accent/5 flex items-center justify-center"><RefreshCw className="w-3 h-3 opacity-70" /></div>
+                                 {reg.address}
+                               </div>
+                             )}
                           </div>
                           {reg.note && (
-                            <div className="mt-3 p-3 rounded-2xl bg-surface-elevated dark:bg-card-border/30 text-xs text-text-secondary italic border border-border-light dark:border-card-border/50">
-                              "{reg.note}"
+                            <div className="mt-4 p-4 rounded-2xl bg-surface-elevated dark:bg-primary-dark/10 text-xs text-text-secondary dark:text-text-muted leading-relaxed italic border border-border-light dark:border-white/5 shadow-inner">
+                              <span className="text-primary not-italic font-bold mr-1">“</span>
+                              {reg.note}
+                              <span className="text-primary not-italic font-bold ml-1">”</span>
                             </div>
                           )}
                         </td>
-                        <td className="px-8 py-5">
-                          <span className="inline-flex px-3 py-1 rounded-lg bg-surface-elevated dark:bg-card-border/40 text-xs font-bold text-text-primary dark:text-foreground">
+                        <td className="px-6 md:px-8 py-6">
+                          <span className="inline-flex px-3 py-1.5 rounded-lg bg-surface-elevated dark:bg-primary-dark/20 text-[10px] font-bold text-text-primary dark:text-foreground border border-border-light dark:border-white/5">
                             {reg.targetGroup}
                           </span>
                         </td>
-                        <td className="px-8 py-5 text-center lowercase">
+                        <td className="px-6 md:px-8 py-6 text-center">
                           {getStatusBadge(reg.status)}
                         </td>
-                        <td className="px-8 py-5 text-right">
+                        <td className="px-6 md:px-8 py-6 text-right">
                           <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
                             {reg.status !== 'approved' && (
                               <button
                                 onClick={() => actions.updateStatus(reg.id, 'approved')}
                                 disabled={state.actionLoading === reg.id}
-                                className="w-10 h-10 rounded-xl bg-success/10 text-success hover:bg-success hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm"
+                                className="w-10 h-10 rounded-xl bg-success/5 text-success hover:bg-success hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm border border-success/10"
                                 title="อนุมัติ"
                               >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
+                                <Check className="w-5 h-5" />
                               </button>
                             )}
                             {reg.status !== 'rejected' && (
                               <button
                                 onClick={() => actions.updateStatus(reg.id, 'rejected')}
                                 disabled={state.actionLoading === reg.id}
-                                className="w-10 h-10 rounded-xl bg-error/10 text-error hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm"
+                                className="w-10 h-10 rounded-xl bg-error/5 text-error hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm border border-error/10"
                                 title="ปฏิเสธ"
                               >
-                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <X className="w-5 h-5" />
                               </button>
                             )}
                             <a
                               href={`/manage-register/edit/${reg.id}`}
-                              className="w-10 h-10 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm"
+                              className="w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/10"
                               title="แก้ไขข้อมูล"
                             >
-                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
+                              <Edit className="w-4 h-4" />
                             </a>
                             <button
                               onClick={() => actions.deleteRegistration(reg.id)}
                               disabled={state.actionLoading === reg.id}
-                              className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-card-border text-text-muted hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm"
+                              className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
                               title="ลบ"
                             >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>
@@ -204,7 +209,7 @@ export function ManageRegisterView({ initialViewModel }: ManageRegisterViewProps
                 </table>
               </div>
             )}
-          </div>
+          </AnimatedCard>
         </AnimatedSection>
       </div>
     </div>
