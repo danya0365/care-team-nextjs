@@ -58,6 +58,14 @@ export class EventsPresenter {
   }
 
   async deleteEvent(id: string): Promise<void> {
+    const count = await this.eventRepository.getRegistrationCount(id);
+    if (count > 0) {
+      throw new Error('ไม่สามารถลบกิจกรรมนี้ได้ เนื่องจากมีผู้ลงทะเบียนเข้าร่วมแล้ว');
+    }
     await this.eventRepository.delete(id);
+  }
+
+  async getRegistrationCount(id: string): Promise<number> {
+    return await this.eventRepository.getRegistrationCount(id);
   }
 }

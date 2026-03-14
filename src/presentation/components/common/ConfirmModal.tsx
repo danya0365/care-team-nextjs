@@ -10,11 +10,12 @@ interface ConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  message: string;
+  message: ReactNode;
   confirmText?: string;
   cancelText?: string;
   type?: 'danger' | 'success' | 'info';
   isLoading?: boolean;
+  showConfirm?: boolean;
 }
 
 export function ConfirmModal({
@@ -27,6 +28,7 @@ export function ConfirmModal({
   cancelText = 'ยกเลิก',
   type = 'info',
   isLoading = false,
+  showConfirm = true,
 }: ConfirmModalProps) {
   // Prevent scrolling when modal is open
   useEffect(() => {
@@ -119,9 +121,9 @@ export function ConfirmModal({
           <h3 className="text-2xl font-black text-text-primary dark:text-foreground mb-3">
             {title}
           </h3>
-          <p className="text-text-secondary dark:text-text-muted font-medium mb-10 leading-relaxed">
+          <div className="text-text-secondary dark:text-text-muted font-medium mb-10 leading-relaxed text-center w-full">
             {message}
-          </p>
+          </div>
 
           <div className="flex w-full gap-4">
             <AnimatedButton
@@ -132,18 +134,20 @@ export function ConfirmModal({
             >
               {cancelText}
             </AnimatedButton>
-            <AnimatedButton
-              onClick={onConfirm}
-              variant={styles.buttonVariant}
-              className={`flex-1 py-4 font-bold ${styles.buttonClass}`}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                confirmText
-              )}
-            </AnimatedButton>
+            {showConfirm && (
+              <AnimatedButton
+                onClick={onConfirm}
+                variant={styles.buttonVariant}
+                className={`flex-1 py-4 font-bold ${styles.buttonClass}`}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  confirmText
+                )}
+              </AnimatedButton>
+            )}
           </div>
         </div>
       </animated.div>

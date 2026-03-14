@@ -38,4 +38,5 @@ export interface IEventRepository {
   create(data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }): Promise<Event>;
   update(id: string, data: Partial<Omit<Event, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Event>;
   delete(id: string): Promise<void>;
+  getRegistrationCount(eventId: string): Promise<number>;
 }

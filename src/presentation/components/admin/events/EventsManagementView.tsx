@@ -1,19 +1,19 @@
 'use client';
 
-import { useEventsPresenter } from '@/src/presentation/presenters/events/useEventsPresenter';
-import { EventsViewModel } from '@/src/presentation/presenters/events/EventsPresenter';
-import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
-import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
+import { Event } from '@/src/application/repositories/IEventRepository';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
-import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
-import { RefreshCw, Check, X, Edit, Trash2, Calendar, Plus, Search, Filter, Download, ExternalLink, Eye, CheckCircle2, Clock } from 'lucide-react';
+import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
+import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
 import { Pagination } from '@/src/presentation/components/common/Pagination';
-import { useState } from 'react';
+import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+import { EventsViewModel } from '@/src/presentation/presenters/events/EventsPresenter';
+import { useEventsPresenter } from '@/src/presentation/presenters/events/useEventsPresenter';
+import { Calendar, CheckCircle2, Clock, Download, Edit, ExternalLink, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
 import { cn } from '@/src/presentation/utils/cn';
-import { Event } from '@/src/application/repositories/IEventRepository';
 import Link from 'next/link';
+import { useState } from 'react';
 
 interface EventsManagementViewProps {
   initialViewModel?: EventsViewModel;
@@ -322,13 +322,6 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
                               >
                                 <ExternalLink className="w-4 h-4" />
                               </Link>
-                              <Link 
-                                href={`/admin/registrations?eventId=${event.id}`}
-                                className="w-10 h-10 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center shadow-sm border border-secondary/10"
-                                title="ดูผู้ลงทะเบียน"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </Link>
                               <button
                                 onClick={() => handleOpenModal(event)}
                                 className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
@@ -337,7 +330,10 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => setDeleteId(event.id)}
+                                onClick={() => {
+                                  setDeleteId(event.id);
+                                  actions.fetchRegistrationCount(event.id);
+                                }}
                                 disabled={state.actionLoading === event.id}
                                 className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
                                 title="ลบ"
@@ -367,18 +363,60 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
 
       <ConfirmModal
         isOpen={deleteId !== null}
-        onClose={() => setDeleteId(null)}
+        onClose={() => {
+          setDeleteId(null);
+          actions.resetRegistrationCount();
+          actions.clearError();
+        }}
         onConfirm={async () => {
           if (deleteId) {
-            await actions.deleteEvent(deleteId);
-            setDeleteId(null);
+            try {
+              await actions.deleteEvent(deleteId);
+              setDeleteId(null);
+              actions.resetRegistrationCount();
+            } catch (err) {
+              // Error is handled in the presenter and state
+            }
           }
         }}
         title="ยืนยันการลบกิจกรรม"
-        message="คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้? ข้อมูลการลงทะเบียนทั้งหมดที่เกี่ยวข้องกับกิจกรรมนี้จะยังคงอยู่แต่จะไม่เชื่อมโยงกับกิจกรรมใดๆ"
+        message={
+          <div className="space-y-4">
+            <p>คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้?</p>
+            
+            <div className="p-4 rounded-2xl bg-surface-elevated dark:bg-white/5 border border-border/50">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-bold text-text-secondary">จำนวนผู้ลงทะเบียน:</span>
+                <span className={cn(
+                  "text-lg font-black",
+                  state.registrationCount === null ? "animate-pulse text-text-muted" : 
+                  state.registrationCount > 0 ? "text-error" : "text-success"
+                )}>
+                  {state.registrationCount === null ? "กำลังคำนวณ..." : `${state.registrationCount} คน`}
+                </span>
+              </div>
+            </div>
+
+            {state.registrationCount !== null && state.registrationCount > 0 && (
+              <div className="p-4 rounded-2xl bg-error/10 border border-error/20 flex gap-3 items-start">
+                <X className="w-5 h-5 text-error shrink-0 mt-0.5" />
+                <p className="text-sm font-bold text-error leading-relaxed">
+                  ไม่สามารถลบกิจกรรมได้เนื่องจากมีข้อมูลผู้ลงทะเบียนค้างอยู่ กรุณาย้ายหรือลบข้อมูลผู้ลงทะเบียนก่อนดำเนินการ
+                </p>
+              </div>
+            )}
+            
+            {state.error && (
+              <div className="p-4 rounded-2xl bg-error/10 border border-error/20 text-sm font-bold text-error">
+                {state.error}
+              </div>
+            )}
+          </div>
+        }
         type="danger"
-        confirmText="ยืนยันการลบ"
-        isLoading={state.actionLoading === deleteId}
+        confirmText={state.registrationCount !== null && state.registrationCount > 0 ? "ไม่สามารถลบได้" : "ยืนยันการลบ"}
+        isLoading={state.actionLoading === deleteId || state.registrationCount === null}
+        showConfirm={!(state.registrationCount !== null && state.registrationCount > 0)}
       />
 
       {/* Modal - Create/Edit Event */}

@@ -1,5 +1,5 @@
 import { db } from '../../database/client';
-import { events } from '../../database/schema';
+import { events, registrations } from '../../database/schema';
 import { eq, and, or, like, desc, asc, count, sql } from 'drizzle-orm';
 import { IEventRepository, Event, EventQueryOptions, PaginatedResult } from '@/src/application/repositories/IEventRepository';
 
@@ -127,6 +127,15 @@ export class DrizzleEventRepository implements IEventRepository {
 
   async delete(id: string): Promise<void> {
     await db.delete(events).where(eq(events.id, id));
+  }
+
+  async getRegistrationCount(eventId: string): Promise<number> {
+    const result = await db
+      .select({ count: count() })
+      .from(registrations)
+      .where(eq(registrations.eventId, eventId));
+    
+    return result[0].count;
   }
 }
 

@@ -11,6 +11,7 @@ export interface EventsState {
   error: string | null;
   actionLoading: string | null;
   submitting: boolean;
+  registrationCount: number | null;
   // Query State
   page: number;
   limit: number;
@@ -35,6 +36,7 @@ export function useEventsPresenter(
     error: null,
     actionLoading: null,
     submitting: false,
+    registrationCount: null,
     // Initial Query Params
     page: 1,
     limit: 10,
@@ -133,13 +135,24 @@ export function useEventsPresenter(
     }
   };
 
+  const fetchRegistrationCount = async (id: string) => {
+    try {
+      const count = await presenter.getRegistrationCount(id);
+      setState(prev => ({ ...prev, registrationCount: count }));
+    } catch (err: any) {
+      setState(prev => ({ ...prev, error: err.message }));
+    }
+  };
+
   const deleteEvent = async (id: string) => {
     setState(prev => ({ ...prev, actionLoading: id }));
     try {
       await presenter.deleteEvent(id);
       await fetchViewModel();
+      setState(prev => ({ ...prev, error: null })); // Clear any potential "cannot delete" errors on success
     } catch (err: any) {
       setState(prev => ({ ...prev, error: err.message }));
+      throw err; // Re-throw to handle in UI if needed
     } finally {
       setState(prev => ({ ...prev, actionLoading: null }));
     }
@@ -152,6 +165,9 @@ export function useEventsPresenter(
       updateEvent,
       toggleStatus,
       deleteEvent,
+      fetchRegistrationCount,
+      resetRegistrationCount: () => setState(prev => ({ ...prev, registrationCount: null })),
+      clearError: () => setState(prev => ({ ...prev, error: null })),
       refresh: fetchViewModel,
       changePage,
       changeLimit,

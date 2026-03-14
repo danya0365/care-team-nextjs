@@ -80,7 +80,20 @@ export class ApiEventRepository implements IEventRepository {
     const response = await fetch(`${this.baseUrl}/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Failed to delete event');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete event');
+    }
+  }
+
+  async getRegistrationCount(eventId: string): Promise<number> {
+    const response = await fetch(`${this.baseUrl}/${eventId}/registration-count`);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch registration count');
+    }
+    const data = await response.json();
+    return data.count;
   }
 }
 
