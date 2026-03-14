@@ -2,6 +2,9 @@
    Care Team Songkhla — Design Tokens
    ============================================================ */
 
+/* custom variants */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Brand Colors — soft healthcare blue */
   --color-primary: #2196F3;
