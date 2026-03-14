@@ -5,10 +5,22 @@ import { drizzleEventRepository } from '@/src/infrastructure/repositories/drizzl
  * API Route: /api/events
  * Handles fetching all events and creating new events
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const events = await drizzleEventRepository.getAll();
-    return NextResponse.json(events);
+    const { searchParams } = new URL(request.url);
+    
+    const options = {
+      search: searchParams.get('search') || undefined,
+      isActive: searchParams.get('isActive') === 'true' ? true : 
+                searchParams.get('isActive') === 'false' ? false : undefined,
+      sortBy: searchParams.get('sortBy') || 'createdAt',
+      sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
+      page: parseInt(searchParams.get('page') || '1'),
+      limit: parseInt(searchParams.get('limit') || '10'),
+    };
+
+    const result = await drizzleEventRepository.getAll(options);
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Events GET API Error:', error);
     return NextResponse.json(

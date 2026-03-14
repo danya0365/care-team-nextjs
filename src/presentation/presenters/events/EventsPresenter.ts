@@ -1,4 +1,4 @@
-import { IEventRepository, Event } from '@/src/application/repositories/IEventRepository';
+import { IEventRepository, Event, EventQueryOptions } from '@/src/application/repositories/IEventRepository';
 
 /**
  * EventsViewModel
@@ -6,6 +6,10 @@ import { IEventRepository, Event } from '@/src/application/repositories/IEventRe
  */
 export interface EventsViewModel {
   events: Event[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   loading: boolean;
   error: string | null;
 }
@@ -18,15 +22,15 @@ export interface EventsViewModel {
 export class EventsPresenter {
   constructor(private readonly eventRepository: IEventRepository) {}
 
-  async getViewModel(): Promise<EventsViewModel> {
+  async getViewModel(options: EventQueryOptions = {}): Promise<EventsViewModel> {
     try {
-      const events = await this.eventRepository.getAll();
+      const result = await this.eventRepository.getAll(options);
       return {
-        events: events.sort((a, b) => {
-          const timeA = a.createdAt instanceof Date ? a.createdAt.getTime() : new Date(a.createdAt).getTime();
-          const timeB = b.createdAt instanceof Date ? b.createdAt.getTime() : new Date(b.createdAt).getTime();
-          return timeB - timeA;
-        }),
+        events: result.data,
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
         loading: false,
         error: null,
       };
@@ -34,13 +38,17 @@ export class EventsPresenter {
       console.error('EventsPresenter Error:', error);
       return {
         events: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0,
         loading: false,
         error: 'Failed to load events',
       };
     }
   }
 
-  async createEvent(data: Omit<Event, 'createdAt' | 'updatedAt'>): Promise<Event> {
+  async createEvent(data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }): Promise<Event> {
     if (!data.title) throw new Error('title is required');
     return await this.eventRepository.create(data);
   }

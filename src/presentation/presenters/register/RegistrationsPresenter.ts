@@ -42,7 +42,7 @@ export class RegistrationsPresenter {
     
     return {
       registrations: paginatedResult.items,
-      events: eventsResult,
+      events: eventsResult.data,
       total: paginatedResult.total,
       page: paginatedResult.page,
       limit: paginatedResult.limit,

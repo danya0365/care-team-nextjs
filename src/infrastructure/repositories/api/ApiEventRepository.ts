@@ -1,4 +1,4 @@
-import { IEventRepository, Event } from '@/src/application/repositories/IEventRepository';
+import { IEventRepository, Event, EventQueryOptions, PaginatedResult } from '@/src/application/repositories/IEventRepository';
 
 /**
  * ApiEventRepository
@@ -33,12 +33,25 @@ export class ApiEventRepository implements IEventRepository {
     }
   }
 
-  async getAll(): Promise<Event[]> {
-    // Implement if needed for the UI
-    const response = await fetch(this.baseUrl);
+  async getAll(options: EventQueryOptions = {}): Promise<PaginatedResult<Event>> {
+    const params = new URLSearchParams();
+    if (options.search) params.append('search', options.search);
+    if (options.isActive !== undefined && options.isActive !== null) {
+      params.append('isActive', String(options.isActive));
+    }
+    if (options.sortBy) params.append('sortBy', options.sortBy);
+    if (options.sortOrder) params.append('sortOrder', options.sortOrder);
+    if (options.page) params.append('page', String(options.page));
+    if (options.limit) params.append('limit', String(options.limit));
+
+    const response = await fetch(`${this.baseUrl}?${params.toString()}`);
     if (!response.ok) throw new Error('Failed to fetch events');
-    const data = await response.json();
-    return data.map((item: any) => this.mapToDomain(item));
+    const result = await response.json();
+    
+    return {
+      ...result,
+      data: result.data.map((item: any) => this.mapToDomain(item))
+    };
   }
 
   async create(data: Omit<Event, 'createdAt' | 'updatedAt'>): Promise<Event> {

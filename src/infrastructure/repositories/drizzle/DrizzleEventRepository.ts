@@ -1,7 +1,7 @@
 import { db } from '../../database/client';
 import { events } from '../../database/schema';
-import { IEventRepository, Event } from '@/src/application/repositories/IEventRepository';
-import { eq } from 'drizzle-orm';
+import { eq, and, or, like, desc, asc, count, sql } from 'drizzle-orm';
+import { IEventRepository, Event, EventQueryOptions, PaginatedResult } from '@/src/application/repositories/IEventRepository';
 
 /**
  * DrizzleEventRepository
@@ -23,14 +23,72 @@ export class DrizzleEventRepository implements IEventRepository {
     } as Event;
   }
 
-  async getAll(): Promise<Event[]> {
-    const result = await db.select().from(events);
-    return result.map(e => ({
+  async getAll(options: EventQueryOptions = {}): Promise<PaginatedResult<Event>> {
+    const { 
+      search, 
+      isActive, 
+      sortBy = 'createdAt', 
+      sortOrder = 'desc', 
+      page = 1, 
+      limit = 10 
+    } = options;
+
+    const offset = (page - 1) * limit;
+    const conditions = [];
+
+    // Search condition
+    if (search) {
+      conditions.push(
+        or(
+          like(events.title, `%${search}%`),
+          like(events.description, `%${search}%`)
+        )
+      );
+    }
+
+    // Status filter
+    if (isActive !== undefined && isActive !== null) {
+      conditions.push(eq(events.isActive, isActive));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Get total count for pagination
+    const totalResult = await db
+      .select({ count: count() })
+      .from(events)
+      .where(whereClause);
+    
+    const total = totalResult[0].count;
+
+    // Sorting
+    let orderBy;
+    const sortField = (events as any)[sortBy] || events.createdAt;
+    orderBy = sortOrder === 'desc' ? desc(sortField) : asc(sortField);
+
+    // Get paginated data
+    const result = await db
+      .select()
+      .from(events)
+      .where(whereClause)
+      .orderBy(orderBy)
+      .limit(limit)
+      .offset(offset);
+
+    const data = result.map(e => ({
       ...e,
       isActive: Boolean(e.isActive),
       startDate: e.startDate ? new Date(e.startDate) : null,
       endDate: e.endDate ? new Date(e.endDate) : null,
     })) as Event[];
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    };
   }
 
   async create(data: Omit<Event, 'createdAt' | 'updatedAt'>): Promise<Event> {

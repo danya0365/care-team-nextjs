@@ -1,125 +1,163 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { EventsPresenter, EventsViewModel } from './EventsPresenter';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { EventsViewModel, EventsPresenter } from './EventsPresenter';
 import { createClientEventsPresenter } from './EventsPresenterClientFactory';
 import { Event } from '@/src/application/repositories/IEventRepository';
 
-export interface EventsPresenterState extends EventsViewModel {
+export interface EventsState {
+  viewModel: EventsViewModel | null;
+  loading: boolean;
+  error: string | null;
+  actionLoading: string | null;
   submitting: boolean;
-  success: boolean;
+  // Query State
+  page: number;
+  limit: number;
+  search: string;
+  isActive: boolean | null;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
 }
 
-export interface EventsPresenterActions {
-  loadData: () => Promise<void>;
-  createEvent: (data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => Promise<boolean>;
-  updateEvent: (id: string, data: Partial<Omit<Event, 'id' | 'createdAt' | 'updatedAt'>>) => Promise<boolean>;
-  deleteEvent: (id: string) => Promise<boolean>;
-  resetStatus: () => void;
-}
-
-/**
- * Custom hook for Events Management presenter
- * Manages the state and provides actions for CRUD operations
- */
 export function useEventsPresenter(
   initialViewModel?: EventsViewModel,
   presenterOverride?: EventsPresenter
-): [EventsPresenterState, EventsPresenterActions] {
+) {
   const presenter = useMemo(
     () => presenterOverride ?? createClientEventsPresenter(),
     [presenterOverride]
   );
 
-  const isMountedRef = useRef(true);
-  const [viewModel, setViewModel] = useState<EventsViewModel>(
-    initialViewModel ?? { events: [], loading: true, error: null }
-  );
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [state, setState] = useState<EventsState>({
+    viewModel: initialViewModel ?? null,
+    loading: !initialViewModel,
+    error: null,
+    actionLoading: null,
+    submitting: false,
+    // Initial Query Params
+    page: 1,
+    limit: 10,
+    search: '',
+    isActive: null,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
 
-  const loadData = useCallback(async () => {
-    setViewModel(prev => ({ ...prev, loading: true, error: null }));
+  const fetchViewModel = useCallback(async (queryOptions?: Partial<EventsState>) => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const data = await presenter.getViewModel();
-      if (isMountedRef.current) {
-        setViewModel(data);
-      }
-    } catch (err) {
-      if (isMountedRef.current) {
-        setViewModel(prev => ({ ...prev, loading: false, error: 'Failed to load events' }));
-      }
+      const options = {
+        page: queryOptions?.page ?? state.page,
+        limit: queryOptions?.limit ?? state.limit,
+        search: queryOptions?.search ?? state.search,
+        isActive: queryOptions?.isActive !== undefined ? queryOptions.isActive : state.isActive,
+        sortBy: queryOptions?.sortBy ?? state.sortBy,
+        sortOrder: queryOptions?.sortOrder ?? state.sortOrder,
+      };
+      
+      const viewModel = await presenter.getViewModel(options);
+      setState(prev => ({ 
+        ...prev, 
+        viewModel, 
+        loading: false,
+        ...queryOptions // Update state with the options used for fetching
+      }));
+    } catch (err: any) {
+      setState(prev => ({ ...prev, error: err.message, loading: false }));
     }
-  }, [presenter]);
+  }, [presenter, state.page, state.limit, state.search, state.isActive, state.sortBy, state.sortOrder]);
 
-  // Load data on initialization if not provided
+  const [debouncedSearch, setDebouncedSearch] = useState(state.search);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (debouncedSearch !== state.search) {
+        fetchViewModel({ search: debouncedSearch, page: 1 });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [debouncedSearch, state.search, fetchViewModel]);
+
+  const changePage = (page: number) => fetchViewModel({ page });
+  const changeLimit = (limit: number) => fetchViewModel({ limit, page: 1 });
+  const applySearch = (search: string) => setDebouncedSearch(search);
+  const applyFilters = (filters: { isActive?: boolean | null }) => 
+    fetchViewModel({ ...filters, page: 1 });
+  const applySorting = (sortBy: string, sortOrder: 'asc' | 'desc') => 
+    fetchViewModel({ sortBy, sortOrder, page: 1 });
+
   useEffect(() => {
     if (!initialViewModel) {
-      loadData();
+      fetchViewModel();
     }
-  }, [initialViewModel, loadData]);
+  }, [initialViewModel]);
 
-  const createEvent = useCallback(async (data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => {
-    setSubmitting(true);
-    setSuccess(false);
+  const toggleStatus = async (id: string, currentStatus: boolean) => {
+    setState(prev => ({ ...prev, actionLoading: id }));
     try {
-      await presenter.createEvent({
-        ...data,
-        id: `event-${Date.now()}`,
-      } as Event);
-      if (isMountedRef.current) {
-        setSuccess(true);
-        await loadData();
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error('Create Event Error:', err);
+      await presenter.updateEvent(id, { isActive: !currentStatus });
+      await fetchViewModel();
+    } catch (err: any) {
+      setState(prev => ({ ...prev, error: err.message }));
+    } finally {
+      setState(prev => ({ ...prev, actionLoading: null }));
+    }
+  };
+
+  const createEvent = async (data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }) => {
+    setState(prev => ({ ...prev, submitting: true }));
+    try {
+      await presenter.createEvent(data);
+      await fetchViewModel();
+      return true;
+    } catch (err: any) {
+      setState(prev => ({ ...prev, error: err.message }));
       return false;
     } finally {
-      if (isMountedRef.current) setSubmitting(false);
+      setState(prev => ({ ...prev, submitting: false }));
     }
-  }, [presenter, loadData]);
+  };
 
-  const updateEvent = useCallback(async (id: string, data: Partial<Omit<Event, 'id' | 'createdAt' | 'updatedAt'>>) => {
-    setSubmitting(true);
-    setSuccess(false);
+  const updateEvent = async (id: string, data: Partial<Omit<Event, 'id' | 'createdAt' | 'updatedAt'>>) => {
+    setState(prev => ({ ...prev, submitting: true }));
     try {
       await presenter.updateEvent(id, data);
-      if (isMountedRef.current) {
-        setSuccess(true);
-        await loadData();
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error('Update Event Error:', err);
+      await fetchViewModel();
+      return true;
+    } catch (err: any) {
+      setState(prev => ({ ...prev, error: err.message }));
       return false;
     } finally {
-      if (isMountedRef.current) setSubmitting(false);
+      setState(prev => ({ ...prev, submitting: false }));
     }
-  }, [presenter, loadData]);
+  };
 
-  const deleteEvent = useCallback(async (id: string) => {
+  const deleteEvent = async (id: string) => {
+    setState(prev => ({ ...prev, actionLoading: id }));
     try {
       await presenter.deleteEvent(id);
-      if (isMountedRef.current) {
-        await loadData();
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error('Delete Event Error:', err);
-      return false;
+      await fetchViewModel();
+    } catch (err: any) {
+      setState(prev => ({ ...prev, error: err.message }));
+    } finally {
+      setState(prev => ({ ...prev, actionLoading: null }));
     }
-  }, [presenter, loadData]);
+  };
 
-  const resetStatus = useCallback(() => {
-    setSuccess(false);
-  }, []);
-
-  return [
-    { ...viewModel, submitting, success },
-    { loadData, createEvent, updateEvent, deleteEvent, resetStatus },
-  ];
+  return {
+    state,
+    actions: {
+      createEvent,
+      updateEvent,
+      toggleStatus,
+      deleteEvent,
+      refresh: fetchViewModel,
+      changePage,
+      changeLimit,
+      applySearch,
+      applyFilters,
+      applySorting,
+    }
+  };
 }

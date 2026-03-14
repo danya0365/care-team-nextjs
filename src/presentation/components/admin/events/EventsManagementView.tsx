@@ -1,39 +1,30 @@
 'use client';
 
-import { PageHeader } from '../../layout/PageHeader';
-import { AnimatedSection } from '../../common/AnimatedSection';
-import { AnimatedCard } from '../../common/AnimatedCard';
-import { AnimatedButton } from '../../common/AnimatedButton';
-import { 
-  Calendar, 
-  Plus, 
-  Search, 
-  ExternalLink, 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  CheckCircle2, 
-  Clock, 
-  Eye,
-  X
-} from 'lucide-react';
-import Link from 'next/link';
-import { useState } from 'react';
 import { useEventsPresenter } from '@/src/presentation/presenters/events/useEventsPresenter';
 import { EventsViewModel } from '@/src/presentation/presenters/events/EventsPresenter';
-import { Event } from '@/src/application/repositories/IEventRepository';
+import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
+import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
+import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
+import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+import { RefreshCw, Check, X, Edit, Trash2, Calendar, Plus, Search, Filter, Download, ExternalLink, Eye, CheckCircle2, Clock } from 'lucide-react';
+import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
+import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
+import { Pagination } from '@/src/presentation/components/common/Pagination';
+import { useState } from 'react';
 import { cn } from '@/src/presentation/utils/cn';
+import { Event } from '@/src/application/repositories/IEventRepository';
+import Link from 'next/link';
 
 interface EventsManagementViewProps {
-  initialViewModel: EventsViewModel;
+  initialViewModel?: EventsViewModel;
 }
 
 export function EventsManagementView({ initialViewModel }: EventsManagementViewProps) {
-  const [state, actions] = useEventsPresenter(initialViewModel);
-  const [searchTerm, setSearchTerm] = useState('');
+  const { state, actions } = useEventsPresenter(initialViewModel);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  
+
   // Form State
   const [formData, setFormData] = useState({
     title: '',
@@ -43,9 +34,31 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
     endDate: '',
   });
 
-  const filteredEvents = state.events.filter(event => 
-    event.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleExportCSV = () => {
+    if (!state.viewModel?.events.length) return;
+
+    const headers = ['Title', 'Description', 'Status', 'Start Date', 'End Date', 'Created At'];
+    
+    const rows = state.viewModel.events.map(event => [
+      `"${event.title}"`,
+      `"${event.description || ''}"`,
+      `"${event.isActive ? 'Active' : 'Inactive'}"`,
+      `"${event.startDate ? new Date(event.startDate).toLocaleDateString('th-TH') : ''}"`,
+      `"${event.endDate ? new Date(event.endDate).toLocaleDateString('th-TH') : ''}"`,
+      `"${new Date(event.createdAt).toLocaleString('th-TH')}"`
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `events_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const handleOpenModal = (event?: Event) => {
     if (event) {
@@ -72,172 +85,303 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let success = false;
-    
     const submissionData = {
-      ...formData,
+      title: formData.title,
+      description: formData.description,
+      isActive: formData.isActive,
       startDate: formData.startDate ? new Date(formData.startDate) : null,
       endDate: formData.endDate ? new Date(formData.endDate) : null,
     };
 
-    if (editingEvent) {
-      success = await actions.updateEvent(editingEvent.id, submissionData);
-    } else {
-      success = await actions.createEvent(submissionData);
-    }
-
-    if (success) {
-      setIsModalOpen(false);
+    try {
+      let success = false;
+      if (editingEvent) {
+        success = await actions.updateEvent(editingEvent.id, submissionData);
+      } else {
+        success = await actions.createEvent(submissionData);
+      }
+      
+      if (success) {
+        setIsModalOpen(false);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้? ข้อมูลการลงทะเบียนที่เกี่ยวข้องจะได้รับผลกระทบ')) {
-      await actions.deleteEvent(id);
-    }
+  const getStatusBadge = (isActive: boolean) => {
+    return isActive ? (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-success/10 text-success border border-success/20">
+        <CheckCircle2 className="w-3 h-3" />
+        เปิดรับสมัคร
+      </span>
+    ) : (
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-text-muted/10 text-text-muted border border-text-muted/20">
+        <Clock className="w-3 h-3" />
+        ปิดกิจกรรม
+      </span>
+    );
+  };
+
+  if (state.loading && !state.viewModel) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-sm font-bold text-text-muted animate-pulse">กำลังโหลดข้อมูล...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const { events, total, page, limit, totalPages } = state.viewModel || { 
+    events: [], 
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 0 
   };
 
   return (
-    <>
+    <div className="min-h-screen pb-20">
       <PageHeader
         title={<><span className="gradient-text">จัดการ</span>กิจกรรม</>}
-        description="สร้างและบริหารจัดการโครงการ/กิจกรรมสำหรับลงทะเบียน"
+        description="บริหารจัดการโครงการและกิจกรรมเพื่อการลงทะเบียนอย่างเป็นระบบ"
         spacing="default"
       >
         <div className="mt-8 flex justify-center md:justify-start">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary dark:text-primary-light text-xs font-bold shadow-sm backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Admin Panel • บริหารจัดการกิจกรรมโครงการ
+            Admin Panel • กิจกรรมทั้งหมด
           </div>
         </div>
       </PageHeader>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <AnimatedSection>
-          <div className="flex flex-wrap items-center gap-4">
-            <AnimatedButton 
-              variant="primary" 
-              size="md" 
-              className="rounded-2xl flex items-center gap-2 px-6 shadow-lg shadow-primary/20 group"
-              onClick={() => handleOpenModal()}
-            >
-              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-              สร้างกิจกรรมใหม่
-            </AnimatedButton>
-            
-            <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted" />
-              <input
-                type="text"
-                placeholder="ค้นหาชื่อกิจกรรม..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative min-w-[300px]">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted transition-colors group-focus-within:text-primary" />
+                <input
+                  type="text"
+                  placeholder="ค้นหาชื่อกิจกรรม..."
+                  defaultValue={state.search}
+                  onChange={(e) => actions.applySearch(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
+                    border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
+                    outline-none transition-all placeholder:text-text-muted font-medium"
+                />
+              </div>
+
+              <select
+                value={state.isActive === null ? '' : String(state.isActive)}
+                onChange={(e) => actions.applyFilters({ isActive: e.target.value === '' ? null : e.target.value === 'true' })}
+                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
                   border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all placeholder:text-text-muted font-medium"
-              />
+                  outline-none transition-all font-bold text-sm"
+              >
+                <option value="">ทุกสถานะ</option>
+                <option value="true">เปิดรับสมัคร</option>
+                <option value="false">ปิดรับสมัคร</option>
+              </select>
+
+              <select
+                value={state.limit}
+                onChange={(e) => actions.changeLimit(Number(e.target.value))}
+                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
+                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
+                  outline-none transition-all font-bold text-sm"
+              >
+                <option value="10">10 รายการ</option>
+                <option value="20">20 รายการ</option>
+                <option value="50">50 รายการ</option>
+                <option value="100">100 รายการ</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <AnimatedButton 
+                variant="outline"
+                size="sm"
+                onClick={handleExportCSV}
+                disabled={!events.length}
+                className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10"
+              >
+                <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                Export CSV
+              </AnimatedButton>
+
+              <AnimatedButton 
+                variant="outline"
+                size="sm"
+                onClick={() => actions.refresh()}
+                className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10"
+              >
+                <RefreshCw className={`w-4 h-4 ${state.loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+                รีเฟรช
+              </AnimatedButton>
+              
+              <AnimatedButton 
+                variant="primary"
+                size="sm"
+                onClick={() => handleOpenModal()}
+                className="rounded-2xl shadow-lg shadow-primary/20 group"
+              >
+                <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                สร้างกิจกรรม
+              </AnimatedButton>
             </div>
           </div>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {state.loading ? (
-          <div className="col-span-full py-20 text-center text-text-muted italic">
-            กำลังโหลดข้อมูลกิจกรรม...
-          </div>
-        ) : filteredEvents.length > 0 ? (
-          filteredEvents.map((event) => (
-            <AnimatedSection key={event.id}>
-              <AnimatedCard className="group h-full relative overflow-hidden flex flex-col p-0">
-                {/* Header Decoration */}
-                <div className={cn(
-                  "h-2 w-full",
-                  event.isActive ? "bg-success" : "bg-text-muted/30"
-                )} />
-                
-                <div className="p-6 flex flex-col flex-1">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={cn(
-                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5",
-                      event.isActive 
-                        ? "bg-success/10 text-success" 
-                        : "bg-text-muted/10 text-text-muted"
-                    )}>
-                      {event.isActive ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                      {event.isActive ? 'เปิดลงทะเบียน' : 'ปิดโครงการ'}
-                    </div>
-                    
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
-                        onClick={() => handleOpenModal(event)}
-                        className="p-2 rounded-lg hover:bg-primary/10 text-primary transition-colors"
-                        title="แก้ไข"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(event.id)}
-                        className="p-2 rounded-lg hover:bg-error/10 text-error transition-colors"
-                        title="ลบ"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+        <AnimatedSection delay={200}>
+          <AnimatedCard className="overflow-hidden p-0 relative">
+            {state.loading && (
+              <div className="absolute inset-0 z-20 bg-white/30 dark:bg-black/20 backdrop-blur-[2px] flex items-center justify-center">
+                <RefreshCw className="w-8 h-8 text-primary animate-spin" />
+              </div>
+            )}
 
-                  <h3 className="text-lg font-black text-text-primary dark:text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
-                    {event.title}
-                  </h3>
-                  
-                  <p className="text-sm text-text-muted mb-6 flex-1 line-clamp-2">
-                    {event.description || 'ไม่มีคำอธิบายสำหรับกิจกรรมนี้'}
-                  </p>
-
-                  <div className="space-y-3 pt-6 border-t border-border/50">
-                    <div className="flex items-center gap-2 text-xs text-text-secondary font-bold">
-                      <Calendar className="w-3.5 h-3.5 opacity-60" />
-                      <span>{event.startDate ? new Date(event.startDate).toLocaleDateString('th-TH') : 'ไม่ระบุ'}</span>
-                      <span className="opacity-40">-</span>
-                      <span>{event.endDate ? new Date(event.endDate).toLocaleDateString('th-TH') : 'ไม่ระบุ'}</span>
-                    </div>
-
-                    <div className="flex gap-2 pt-2">
-                      <Link 
-                        href={`/event/${event.id}/register`}
-                        target="_blank"
-                        className="flex-1 py-2.5 px-4 rounded-xl bg-primary/10 text-primary text-xs font-black 
-                          hover:bg-primary hover:text-white transition-all text-center flex items-center justify-center gap-2"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        ลิงก์ลงทะเบียน
-                      </Link>
-                      <Link 
-                        href={`/admin/manage-register?eventId=${event.id}`}
-                        className="w-11 h-11 rounded-xl bg-surface-elevated dark:bg-white/5 border border-border/50 
-                          flex items-center justify-center hover:bg-surface transition-all text-text-secondary"
-                        title="ดูผู้ลงทะเบียน"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Link>
-                    </div>
-                  </div>
+            {events.length === 0 ? (
+              <div className="p-16 md:p-24 text-center">
+                <div className="w-20 h-20 bg-primary/5 dark:bg-primary-dark/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6 rotate-3">
+                  <Calendar className="w-10 h-10 text-primary/30" />
                 </div>
-              </AnimatedCard>
-            </AnimatedSection>
-          ))
-        ) : (
-          <div className="col-span-full py-20 text-center">
-            <div className="w-20 h-20 bg-surface-elevated dark:bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6 opacity-40">
-              <Calendar className="w-10 h-10" />
-            </div>
-            <h4 className="text-xl font-bold text-text-secondary mb-2">ไม่พบกิจกรรม</h4>
-            <p className="text-text-muted">ลองสร้างกิจกรรมใหม่เพื่อเริ่มรับการลงทะเบียน</p>
-          </div>
-        )}
-      </div>
-    </div>
+                <h3 className="text-xl font-bold text-text-primary dark:text-foreground">ไม่พบกิจกรรม</h3>
+                <p className="text-text-muted mt-2 max-w-sm mx-auto text-sm">
+                  {state.search || state.isActive !== null ? 'ลองเปลี่ยนเงื่อนไขการค้นหา' : 'เริ่มสร้างกิจกรรมแรกเพื่อรับการลงทะเบียน'}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-primary/5 dark:bg-primary-dark/5 text-[10px] md:text-xs font-bold uppercase tracking-widest text-text-muted-foreground/80">
+                        <DataTableHeader 
+                          label="หัวข้อกิจกรรม" 
+                          sortBy="title" 
+                          currentSortBy={state.sortBy} 
+                          currentSortOrder={state.sortOrder} 
+                          onSort={actions.applySorting} 
+                        />
+                        <DataTableHeader 
+                          label="ระยะเวลา" 
+                          sortBy="startDate" 
+                          currentSortBy={state.sortBy} 
+                          currentSortOrder={state.sortOrder} 
+                          onSort={actions.applySorting} 
+                        />
+                        <DataTableHeader 
+                          label="สถานะ" 
+                          sortBy="isActive" 
+                          currentSortBy={state.sortBy} 
+                          currentSortOrder={state.sortOrder} 
+                          onSort={actions.applySorting} 
+                          className="text-center"
+                        />
+                        <th className="px-6 md:px-8 py-5 border-b border-border-light dark:border-white/5 text-right">ลิงก์ / การจัดการ</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border-light dark:divide-white/5">
+                      {events.map((event) => (
+                        <tr key={event.id} className="hover:bg-primary/5 dark:hover:bg-primary-dark/5 transition-colors group">
+                          <td className="px-6 md:px-8 py-6">
+                            <div className="font-bold text-text-primary dark:text-foreground group-hover:text-primary transition-colors text-base">{event.title}</div>
+                            <div className="text-sm text-text-secondary dark:text-text-muted line-clamp-1 mt-1 max-w-md">
+                              {event.description || 'ไม่มีคำอธิบาย'}
+                            </div>
+                            <div className="mt-3 flex items-center gap-2 text-[10px] text-text-muted font-bold tracking-tight">
+                              <Calendar className="w-3 h-3 opacity-50" />
+                              สร้างเมื่อ {new Date(event.createdAt).toLocaleDateString('th-TH')}
+                            </div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <div className="flex flex-col gap-1 text-[11px] font-bold text-text-secondary">
+                              <div className="flex items-center gap-2">
+                                <span className="w-8 opacity-50">เริ่ม:</span>
+                                <span>{event.startDate ? new Date(event.startDate).toLocaleDateString('th-TH') : '-'}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-8 opacity-50">จบ:</span>
+                                <span>{event.endDate ? new Date(event.endDate).toLocaleDateString('th-TH') : '-'}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6 text-center">
+                            {getStatusBadge(event.isActive)}
+                          </td>
+                          <td className="px-6 md:px-8 py-6 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
+                              <Link 
+                                href={`/event/${event.id}/register`}
+                                target="_blank"
+                                className="w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/10"
+                                title="ดูหน้าลงทะเบียน"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </Link>
+                              <Link 
+                                href={`/admin/registrations?eventId=${event.id}`}
+                                className="w-10 h-10 rounded-xl bg-secondary/5 text-secondary hover:bg-secondary hover:text-white transition-all flex items-center justify-center shadow-sm border border-secondary/10"
+                                title="ดูผู้ลงทะเบียน"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Link>
+                              <button
+                                onClick={() => handleOpenModal(event)}
+                                className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
+                                title="แก้ไข"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteId(event.id)}
+                                disabled={state.actionLoading === event.id}
+                                className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-error hover:text-white transition-all disabled:opacity-50 flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
+                                title="ลบ"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-    {/* Modal - Create/Edit Event */}
+                <Pagination 
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={actions.changePage}
+                  totalRecords={total}
+                  limit={limit}
+                />
+              </>
+            )}
+          </AnimatedCard>
+        </AnimatedSection>
+      </div>
+
+      <ConfirmModal
+        isOpen={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={async () => {
+          if (deleteId) {
+            await actions.deleteEvent(deleteId);
+            setDeleteId(null);
+          }
+        }}
+        title="ยืนยันการลบกิจกรรม"
+        message="คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้? ข้อมูลการลงทะเบียนทั้งหมดที่เกี่ยวข้องกับกิจกรรมนี้จะยังคงอยู่แต่จะไม่เชื่อมโยงกับกิจกรรมใดๆ"
+        type="danger"
+        confirmText="ยืนยันการลบ"
+        isLoading={state.actionLoading === deleteId}
+      />
+
+      {/* Modal - Create/Edit Event */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-xl" onClick={() => setIsModalOpen(false)} />
@@ -335,6 +479,6 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
           </AnimatedCard>
         </div>
       )}
-    </>
+    </div>
   );
 }

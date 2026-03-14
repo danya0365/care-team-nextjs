@@ -22,7 +22,7 @@ export class CreateRegistrationPresenter {
   ) {}
 
   async getViewModel(): Promise<CreateRegistrationViewModel> {
-    const events = await this.eventRepository.getAll();
+    const eventsResult = await this.eventRepository.getAll({ isActive: true, limit: 100 });
     
     // Static data for groups
     const targetGroups = [
@@ -35,7 +35,7 @@ export class CreateRegistrationPresenter {
     ];
 
     return {
-      events: events.filter(e => e.isActive),
+      events: eventsResult.data,
       targetGroups,
     };
   }

@@ -15,10 +15,27 @@ export interface Event {
   updatedAt: Date;
 }
 
+export interface EventQueryOptions {
+  search?: string;
+  isActive?: boolean | null;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface IEventRepository {
   getById(id: string): Promise<Event | null>;
-  getAll(): Promise<Event[]>;
-  create(data: Omit<Event, 'createdAt' | 'updatedAt'>): Promise<Event>;
+  getAll(options?: EventQueryOptions): Promise<PaginatedResult<Event>>;
+  create(data: Omit<Event, 'id' | 'createdAt' | 'updatedAt'> & { id?: string }): Promise<Event>;
   update(id: string, data: Partial<Omit<Event, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Event>;
   delete(id: string): Promise<void>;
 }
