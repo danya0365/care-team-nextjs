@@ -2,11 +2,13 @@ import { db } from '../../database/client';
 import { registrations, events } from '../../database/schema';
 import {
   IRegistrationRepository,
+  PaginatedResult,
   Registration,
   RegistrationData,
+  RegistrationQueryOptions,
 } from '@/src/application/repositories/IRegistrationRepository';
 import { v4 as uuidv4 } from 'uuid';
-import { eq } from 'drizzle-orm';
+import { eq, and, like, or, sql, desc, asc } from 'drizzle-orm';
 
 /**
  * DrizzleRegistrationRepository
@@ -31,19 +33,105 @@ export class DrizzleRegistrationRepository implements IRegistrationRepository {
     return result[0];
   }
 
-  async getAll(): Promise<Registration[]> {
-    const result = await db
+  async getAll(options: RegistrationQueryOptions = {}): Promise<PaginatedResult<Registration>> {
+    const { 
+      page = 1, 
+      limit = 10, 
+      search, 
+      status, 
+      eventId, 
+      sortBy = 'createdAt', 
+      sortOrder = 'desc' 
+    } = options;
+    
+    const offset = (page - 1) * limit;
+
+    // 1. Build where clause
+    const conditions = [];
+    if (search) {
+      conditions.push(or(
+        like(registrations.name, `%${search}%`),
+        like(registrations.email, `%${search}%`),
+        like(registrations.phone, `%${search}%`)
+      ));
+    }
+    if (status) {
+      conditions.push(eq(registrations.status, status));
+    }
+    if (eventId) {
+      conditions.push(eq(registrations.eventId, eventId));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // 2. Build order by
+    let orderBy;
+    const sortCol = sortBy === 'eventTitle' ? events.title : (registrations as any)[sortBy];
+    if (sortCol) {
+      orderBy = sortOrder === 'desc' ? desc(sortCol) : asc(sortCol);
+    } else {
+      orderBy = desc(registrations.createdAt);
+    }
+
+    // 3. Get total count
+    const totalResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(registrations)
+      .where(whereClause);
+    const total = Number(totalResult[0]?.count || 0);
+
+    // 4. Get paginated items
+    const itemsResult = await db
       .select({
         registration: registrations,
         eventTitle: events.title,
       })
       .from(registrations)
-      .leftJoin(events, eq(registrations.eventId, events.id));
+      .leftJoin(events, eq(registrations.eventId, events.id))
+      .where(whereClause)
+      .orderBy(orderBy)
+      .limit(limit)
+      .offset(offset);
 
-    return result.map((row) => ({
+    const items = itemsResult.map((row) => ({
       ...row.registration,
       eventTitle: row.eventTitle,
     }));
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getStats(): Promise<{ total: number; pending: number; approved: number; rejected: number }> {
+    const result = await db
+      .select({
+        status: registrations.status,
+        count: sql<number>`count(*)`
+      })
+      .from(registrations)
+      .groupBy(registrations.status);
+
+    const stats = {
+      total: 0,
+      pending: 0,
+      approved: 0,
+      rejected: 0
+    };
+
+    result.forEach(row => {
+      const count = Number(row.count);
+      stats.total += count;
+      if (row.status === 'pending') stats.pending = count;
+      else if (row.status === 'approved') stats.approved = count;
+      else if (row.status === 'rejected') stats.rejected = count;
+    });
+
+    return stats;
   }
 
   async getById(id: string): Promise<Registration | null> {

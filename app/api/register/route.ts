@@ -22,11 +22,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const result = await drizzleRegistrationRepository.getAll();
+    const { searchParams } = new URL(request.url);
+    
+    const options = {
+      page: Number(searchParams.get('page')) || 1,
+      limit: Number(searchParams.get('limit')) || 10,
+      search: searchParams.get('search') || undefined,
+      status: searchParams.get('status') || undefined,
+      eventId: searchParams.get('eventId') || undefined,
+      sortBy: searchParams.get('sortBy') || undefined,
+      sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || undefined,
+    };
+
+    const result = await drizzleRegistrationRepository.getAll(options);
     return NextResponse.json(result);
   } catch (error: any) {
+    console.error('Registration API GET Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch registrations' },
       { status: 500 }

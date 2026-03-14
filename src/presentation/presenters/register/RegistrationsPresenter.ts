@@ -1,11 +1,19 @@
 import {
   IRegistrationRepository,
+  PaginatedResult,
   Registration,
+  RegistrationQueryOptions,
 } from '@/src/application/repositories/IRegistrationRepository';
+import { IEventRepository, Event } from '@/src/application/repositories/IEventRepository';
 import { Metadata } from 'next';
 
 export interface RegistrationsViewModel {
   registrations: Registration[];
+  events: Event[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   stats: {
     total: number;
     pending: number;
@@ -20,29 +28,25 @@ export interface RegistrationsViewModel {
  * Following Clean Architecture - Presentation layer
  */
 export class RegistrationsPresenter {
-  constructor(private repository: IRegistrationRepository) {}
+  constructor(
+    private repository: IRegistrationRepository,
+    private eventRepository: IEventRepository
+  ) {}
 
-  async getViewModel(): Promise<RegistrationsViewModel> {
-    const list = await this.repository.getAll();
+  async getViewModel(options: RegistrationQueryOptions = {}): Promise<RegistrationsViewModel> {
+    const [paginatedResult, stats, eventsResult] = await Promise.all([
+      this.repository.getAll(options),
+      this.repository.getStats(),
+      this.eventRepository.getAll()
+    ]);
     
-    // Sort by latest first
-    const registrations = [...list].sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    const stats = registrations.reduce(
-      (acc, reg) => {
-        acc.total++;
-        if (reg.status === 'pending') acc.pending++;
-        else if (reg.status === 'approved') acc.approved++;
-        else if (reg.status === 'rejected') acc.rejected++;
-        return acc;
-      },
-      { total: 0, pending: 0, approved: 0, rejected: 0 }
-    );
-
     return {
-      registrations,
+      registrations: paginatedResult.items,
+      events: eventsResult,
+      total: paginatedResult.total,
+      page: paginatedResult.page,
+      limit: paginatedResult.limit,
+      totalPages: paginatedResult.totalPages,
       stats,
     };
   }
