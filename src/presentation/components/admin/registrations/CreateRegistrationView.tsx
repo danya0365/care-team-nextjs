@@ -7,6 +7,7 @@ import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSe
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { RegistrationData } from '@/src/application/repositories/IRegistrationRepository';
 import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, PlusCircle, AlertCircle, Users, Calendar } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
@@ -20,10 +21,15 @@ export function CreateRegistrationView({ initialViewModel }: CreateRegistrationV
   
   const [formData, setFormData] = useState<RegistrationData>({
     name: '',
+    nickname: '',
     email: '',
     phone: '',
-    targetGroup: '',
     address: '',
+    dateOfBirth: '',
+    requestNeedles: false,
+    condomSize: '',
+    requestHivTest: false,
+    substanceAbuseHistory: '',
     note: '',
     eventId: '',
   });
@@ -31,8 +37,13 @@ export function CreateRegistrationView({ initialViewModel }: CreateRegistrationV
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,23 +118,13 @@ export function CreateRegistrationView({ initialViewModel }: CreateRegistrationV
                   <label className={labelClasses}>
                     <Calendar className="w-4 h-4 text-primary/60" /> กิจกรรม / แคมเปญ
                   </label>
-                  <div className="relative">
-                    <select
-                      required
-                      name="eventId"
-                      value={formData.eventId || ''}
-                      onChange={handleChange}
-                      className={`${inputClasses} appearance-none cursor-pointer border-primary/30 dark:border-primary-light/20`}
-                    >
-                      <option value="" disabled className="dark:bg-background text-text-muted italic">--- กรุณาเลือกกิจกรรม ---</option>
-                      {state.viewModel?.events.map(event => (
-                        <option key={event.id} value={event.id} className="dark:bg-background">
-                          {event.title}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                  </div>
+                  <SearchableSelect
+                    options={state.viewModel?.events.map(event => ({ label: event.title, value: event.id })) || []}
+                    value={formData.eventId || ''}
+                    onChange={(val) => handleChange({ target: { name: 'eventId', value: val } } as any)}
+                    placeholder="--- กรุณาเลือกกิจกรรม ---"
+                    className={`${inputClasses} border-primary/30 dark:border-primary-light/20`}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,6 +140,31 @@ export function CreateRegistrationView({ initialViewModel }: CreateRegistrationV
                       onChange={handleChange}
                       className={inputClasses}
                       placeholder="สมชาย ใจดี"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
+                      <User className="w-4 h-4 text-primary/60" /> ชื่อเล่น
+                    </label>
+                    <input
+                      type="text"
+                      name="nickname"
+                      value={formData.nickname || ''}
+                      onChange={handleChange}
+                      className={inputClasses}
+                      placeholder="ตัวอย่าง: สมชาย"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
+                      <Calendar className="w-4 h-4 text-primary/60" /> วันเดือนปีเกิด
+                    </label>
+                    <input
+                      type="date"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth || ''}
+                      onChange={handleChange}
+                      className={inputClasses}
                     />
                   </div>
                   <div className="space-y-2">
@@ -173,27 +199,6 @@ export function CreateRegistrationView({ initialViewModel }: CreateRegistrationV
 
                 <div className="space-y-2">
                   <label className={labelClasses}>
-                    <Users className="w-4 h-4 text-primary/60" /> กลุ่มเป้าหมาย
-                  </label>
-                  <div className="relative">
-                    <select
-                      required
-                      name="targetGroup"
-                      value={formData.targetGroup}
-                      onChange={handleChange}
-                      className={`${inputClasses} appearance-none cursor-pointer`}
-                    >
-                      <option value="" disabled className="dark:bg-background text-text-muted italic">--- เลือกกลุ่มเป้าหมาย ---</option>
-                      {state.viewModel?.targetGroups.map(group => (
-                        <option key={group} value={group} className="dark:bg-background font-medium">{group}</option>
-                      ))}
-                    </select>
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className={labelClasses}>
                     <MapPin className="w-4 h-4 text-primary/60" /> ที่อยู่ / พื้นที่
                   </label>
                   <input
@@ -203,6 +208,69 @@ export function CreateRegistrationView({ initialViewModel }: CreateRegistrationV
                     onChange={handleChange}
                     className={inputClasses}
                     placeholder="ระบุอำเภอหรือระดับพื้นที่"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="requestNeedles"
+                      name="requestNeedles"
+                      checked={formData.requestNeedles}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded text-primary bg-surface border-border-light focus:ring-primary dark:bg-primary-dark/20 dark:border-white/10 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="requestNeedles" className="text-sm font-bold text-text-primary dark:text-foreground cursor-pointer">
+                      ขอรับบริการ เข็ม สะอาด
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="requestHivTest"
+                      name="requestHivTest"
+                      checked={formData.requestHivTest}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded text-primary bg-surface border-border-light focus:ring-primary dark:bg-primary-dark/20 dark:border-white/10 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="requestHivTest" className="text-sm font-bold text-text-primary dark:text-foreground cursor-pointer">
+                      ขอชุดตรวจ HIV ด้วยตนเอง
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className={labelClasses}>
+                    <PlusCircle className="w-4 h-4 text-primary/60" /> ไซส์ถุงยางอนามัยที่ต้องการ
+                  </label>
+                  <SearchableSelect
+                    options={[
+                      { label: 'ไม่ระบุ', value: 'none' },
+                      { label: '49', value: '49' },
+                      { label: '52', value: '52' },
+                      { label: '54', value: '54' },
+                      { label: '56', value: '56' }
+                    ]}
+                    value={formData.condomSize || ''}
+                    onChange={(val) => handleChange({ target: { name: 'condomSize', value: val === 'none' ? null : val } } as any)}
+                    placeholder="คลิกเพื่อเลือกไซส์ (เว้นว่างได้)"
+                    className={inputClasses}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className={labelClasses}>
+                    <AlertCircle className="w-4 h-4 text-primary/60" /> ประวัติการใช้สารเสพติด (ถ้ามี)
+                  </label>
+                  <textarea
+                    name="substanceAbuseHistory"
+                    rows={2}
+                    value={formData.substanceAbuseHistory || ''}
+                    onChange={handleChange}
+                    className={`${inputClasses} resize-none h-20`}
+                    placeholder="ระบุประวัติย่อๆ (ข้ามได้ถ้าไม่มี)"
                   />
                 </div>
 

@@ -33,8 +33,8 @@ export class RegisterPresenter {
 
   async submitRegistration(data: RegistrationData): Promise<Registration> {
     // Basic validation
-    if (!data.name || !data.phone || !data.targetGroup) {
-      throw new Error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ชื่อ, เบอร์โทรศัพท์, กลุ่มเป้าหมาย)');
+    if (!data.name || !data.phone) {
+      throw new Error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (ชื่อ, เบอร์โทรศัพท์)');
     }
 
     // Phone validation (basic)
@@ -45,9 +45,7 @@ export class RegisterPresenter {
     return await this.registrationRepository.create(data);
   }
 
-  getTargetGroups(): string[] {
-    return ['ผู้ใช้ยาฉีด (PWID)', 'กลุ่ม MSM', 'พนักงานบริการ (Sex Worker)', 'ประชากรกลุ่มเปราะบาง (อื่นๆ)'];
-  }
+
 
   generateMetadata(): Metadata {
     return {

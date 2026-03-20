@@ -543,14 +543,20 @@ export interface [PageName]ViewModel {
 /**
  * Presenter for [PageName] management
  * ✅ Receives repository via constructor injection (not Supabase directly)
+ * ✅ Serves as the Single Source of Truth for both UI Views and API Routes
  */
 export class [PageName]Presenter {
   constructor(
     private readonly repository: I[PageItem]Repository
   ) {}
 
+  // ============================================================
+  // VIEW MODEL METHODS (For Client/Server Components)
+  // ============================================================
+
   /**
    * Get view model for the page
+   * ⚠️ Use this ONLY for rendering UI views, NOT for API route responses
    */
   async getViewModel(page: number = 1, perPage: number = 10): Promise<[PageName]ViewModel> {
     try {
@@ -582,6 +588,11 @@ export class [PageName]Presenter {
       description: "ระบบจัดการ[PageThaiDescription]",
     };
   }
+
+  // ============================================================
+  // GRANULAR DATA METHODS (For API Routes & Individual Actions)
+  // ============================================================
+  // ⚠️ API Routes MUST call these methods individually rather than using getViewModel()
 
   /**
    * Create a new item
@@ -1583,20 +1594,14 @@ src/presentation/components/[page-name]/[PageName]View.tsx
 - Provide user-friendly error messages
 - Use fallback UI when needed
 
-### 4. No Hardcoded Data (Strict Rule)
-
-- **Do NOT** hardcode arrays, static lists, or data objects inside Presenters or UI components.
-- All static data must be placed in `src/config` (for simple site configurations/SEO) or `src/infrastructure/repositories/static` (for business entities, utilizing the Repository Pattern).
-- Presenters should only act as a bridge calling `repository.getAll()` or similar methods.
-
-### 5. Performance
+### 4. Performance
 
 - Use parallel data fetching with `Promise.all`
 - Implement proper loading states
 - Use dynamic imports for code splitting
 - Optimize re-renders with proper state management
 
-### 6. User Experience
+### 5. User Experience
 
 - Provide loading indicators
 - Show empty states with helpful messages
@@ -1604,7 +1609,7 @@ src/presentation/components/[page-name]/[PageName]View.tsx
 - Use consistent Thai language localization
 - Ensure responsive design
 
-### 7. Type Safety
+### 6. Type Safety
 
 - Use TypeScript interfaces for all data structures
 - Implement proper validation

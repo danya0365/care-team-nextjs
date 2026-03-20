@@ -7,7 +7,6 @@ import { Metadata } from 'next';
 
 export interface EditRegistrationViewModel {
   registration: Registration;
-  targetGroups: string[];
 }
 
 /**
@@ -23,19 +22,8 @@ export class EditRegistrationPresenter {
       throw new Error('ไม่พบข้อมูลการลงทะเบียน');
     }
 
-    // Static data for groups
-    const targetGroups = [
-      'ผู้ใช้สารเสพติดชนิดฉีด (PWID)',
-      'กลุ่มชายที่มีเพศสัมพันธ์กับชาย (MSM)',
-      'พนักงานบริการ (Sex Worker)',
-      'ผู้ใช้เมทแอมเฟตามีน (Meth)',
-      'กลุ่มประชากรข้ามชาติ',
-      'กลุ่มอื่นๆ',
-    ];
-
     return {
       registration,
-      targetGroups,
     };
   }
 

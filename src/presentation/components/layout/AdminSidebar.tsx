@@ -74,7 +74,7 @@ export function AdminSidebar() {
     { label: 'ภาพรวมระบบ', href: '/admin', icon: BarChart3 },
     { label: 'จัดการกิจกรรม', href: '/admin/events', icon: Calendar },
     { label: 'จัดการการลงทะเบียน', href: '/admin/registrations', icon: Users },
-    { label: 'ตั้งค่าระบบ', href: '#', icon: Settings },
+    { label: 'ตั้งค่าระบบ', href: '/admin/settings', icon: Settings },
   ];
 
   const sidebarSpring = useSpring({

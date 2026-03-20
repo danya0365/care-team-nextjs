@@ -5,11 +5,13 @@ import { RegistrationsViewModel } from '@/src/presentation/presenters/register/R
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
-import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download } from 'lucide-react';
+import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download, Info } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
 import { Pagination } from '@/src/presentation/components/common/Pagination';
+import { Skeleton } from '@/src/presentation/components/common/Skeleton';
 import { useState } from 'react';
 import { cn } from '@/src/presentation/utils/cn';
 
@@ -20,12 +22,13 @@ interface RegistrationsManagementViewProps {
 export function RegistrationsManagementView({ initialViewModel }: RegistrationsManagementViewProps) {
   const { state, actions } = useRegistrationsPresenter(initialViewModel);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isCsvHelperOpen, setIsCsvHelperOpen] = useState(false);
 
   const handleExportCSV = () => {
     if (!state.viewModel?.registrations.length) return;
 
     // Define CSV Headers
-    const headers = ['Name', 'Phone', 'Email', 'Status', 'Event', 'Target Group', 'Created At'];
+    const headers = ['Name', 'Phone', 'Email', 'Status', 'Event', 'Created At'];
     
     // Convert data to CSV rows
     const rows = state.viewModel.registrations.map(reg => [
@@ -34,7 +37,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
       `"${reg.email || ''}"`,
       `"${reg.status}"`,
       `"${reg.eventTitle || ''}"`,
-      `"${reg.targetGroup}"`,
       `"${new Date(reg.createdAt).toLocaleString('th-TH')}"`
     ]);
 
@@ -84,10 +86,64 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
 
   if (state.loading && !state.viewModel) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="text-sm font-bold text-text-muted animate-pulse">กำลังโหลดข้อมูล...</p>
+      <div className="min-h-screen pb-20">
+        <PageHeader
+          title={<Skeleton className="w-64 h-10 lg:h-14 mt-2" />}
+          description={<Skeleton className="w-full max-w-md h-5 mt-4" />}
+          spacing="default"
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 w-full animate-in fade-in duration-1000">
+          <div className="flex flex-wrap gap-4 mb-6">
+            <Skeleton className="h-[52px] w-full md:w-[300px]" />
+            <Skeleton className="h-[52px] w-[180px]" />
+            <Skeleton className="h-[52px] w-[220px]" />
+            <div className="flex-1"></div>
+            <Skeleton className="h-10 w-32 rounded-2xl" />
+            <Skeleton className="h-10 w-32 rounded-2xl" />
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-6 md:p-8 rounded-[2rem] bg-white dark:bg-card-bg shadow-sm border border-border-light dark:border-white/5 h-[160px] flex flex-col justify-between">
+                <Skeleton className="w-12 h-12 rounded-2xl" />
+                <div>
+                  <Skeleton className="w-20 h-3 mb-3" />
+                  <Skeleton className="w-14 h-8" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-[2.5rem] bg-white dark:bg-card-bg shadow-xl shadow-black/5 dark:shadow-black/20 border border-border-light dark:border-white/5 p-0 overflow-hidden">
+            <div className="bg-primary/5 dark:bg-primary-dark/5 px-6 md:px-8 py-5 flex items-center justify-between">
+               <Skeleton className="w-24 h-4 bg-primary/10" />
+               <Skeleton className="w-32 h-4 bg-primary/10" />
+               <Skeleton className="w-24 h-4 bg-primary/10" />
+               <Skeleton className="w-16 h-4 bg-primary/10" />
+               <Skeleton className="w-12 h-4 bg-primary/10" />
+            </div>
+            <div className="divide-y divide-border-light dark:divide-white/5">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="px-6 md:px-8 py-6 flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="w-20 h-4" />
+                    <Skeleton className="w-16 h-3" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="w-40 h-5" />
+                    <Skeleton className="w-32 h-4" />
+                  </div>
+                  <Skeleton className="w-28 h-6 rounded-xl" />
+                  <Skeleton className="w-24 h-6 rounded-xl" />
+                  <div className="flex gap-2">
+                     <Skeleton className="w-10 h-10 rounded-xl" />
+                     <Skeleton className="w-10 h-10 rounded-xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -135,58 +191,68 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                 />
               </div>
 
-              <select
-                value={state.status}
-                onChange={(e) => actions.applyFilters({ status: e.target.value })}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="">ทุกสถานะ</option>
-                <option value="pending">รอดำเนินการ</option>
-                <option value="approved">อนุมัติแล้ว</option>
-                <option value="rejected">ปฏิเสธ</option>
-              </select>
+              <div className="w-[180px]">
+                <SearchableSelect
+                  options={[
+                    { label: 'ทุกสถานะ', value: '' },
+                    { label: 'รอดำเนินการ', value: 'pending' },
+                    { label: 'อนุมัติแล้ว', value: 'approved' },
+                    { label: 'ปฏิเสธ', value: 'rejected' }
+                  ]}
+                  value={state.status}
+                  onChange={(val) => actions.applyFilters({ status: val })}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
 
-              <select
-                value={state.eventId || ''}
-                onChange={(e) => actions.applyFilters({ eventId: e.target.value || null })}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm max-w-[200px]"
-              >
-                <option value="">ทุกกิจกรรม</option>
-                {events.map(event => (
-                  <option key={event.id} value={event.id}>{event.title}</option>
-                ))}
-              </select>
+              <div className="w-[220px]">
+                <SearchableSelect
+                  options={[
+                    { label: 'ทุกกิจกรรม', value: '' },
+                    ...events.map(event => ({ label: event.title, value: event.id }))
+                  ]}
+                  value={state.eventId || ''}
+                  onChange={(val) => actions.applyFilters({ eventId: val || null })}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
 
-              <select
-                value={state.limit}
-                onChange={(e) => actions.changeLimit(Number(e.target.value))}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="10">10 รายการ</option>
-                <option value="20">20 รายการ</option>
-                <option value="50">50 รายการ</option>
-                <option value="100">100 รายการ</option>
-                <option value="500">500 รายการ</option>
-              </select>
+              <div className="w-[140px]">
+                <SearchableSelect
+                  options={[
+                    { label: '10 รายการ', value: '10' },
+                    { label: '20 รายการ', value: '20' },
+                    { label: '50 รายการ', value: '50' },
+                    { label: '100 รายการ', value: '100' },
+                    { label: '500 รายการ', value: '500' }
+                  ]}
+                  value={String(state.limit)}
+                  onChange={(val) => actions.changeLimit(Number(val))}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <AnimatedButton 
-                variant="outline"
-                size="sm"
-                onClick={handleExportCSV}
-                disabled={!registrations.length}
-                className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10"
-              >
-                <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-                Export CSV
-              </AnimatedButton>
+              <div className="flex items-center gap-1">
+                <AnimatedButton 
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCSV}
+                  disabled={!registrations.length}
+                  className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10 shadow-sm pr-4"
+                >
+                  <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                  <span className="font-bold">Export CSV</span>
+                </AnimatedButton>
+                <button 
+                  onClick={() => setIsCsvHelperOpen(true)}
+                  className="w-8 h-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white flex items-center justify-center transition-all shadow-sm border border-primary/20"
+                  title="คำแนะนำการดึงข้อมูล"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
 
               <AnimatedButton 
                 variant="outline"
@@ -284,13 +350,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                           onSort={actions.applySorting} 
                         />
                         <DataTableHeader 
-                          label="กลุ่มเป้าหมาย" 
-                          sortBy="targetGroup" 
-                          currentSortBy={state.sortBy} 
-                          currentSortOrder={state.sortOrder} 
-                          onSort={actions.applySorting} 
-                        />
-                        <DataTableHeader 
                           label="สถานะ" 
                           sortBy="status" 
                           currentSortBy={state.sortBy} 
@@ -345,11 +404,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                                 {reg.eventTitle || 'ไม่ระบุกิจกรรม'}
                               </span>
                             </div>
-                          </td>
-                          <td className="px-6 md:px-8 py-6">
-                            <span className="inline-flex px-3 py-1.5 rounded-lg bg-surface-elevated dark:bg-primary-dark/20 text-[10px] font-bold text-text-primary dark:text-foreground border border-border-light dark:border-white/5">
-                              {reg.targetGroup}
-                            </span>
                           </td>
                           <td className="px-6 md:px-8 py-6 text-center">
                             {getStatusBadge(reg.status)}
@@ -426,6 +480,30 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
         type="danger"
         confirmText="ยืนยันการลบ"
         isLoading={state.actionLoading === deleteId}
+      />
+
+      <ConfirmModal
+        isOpen={isCsvHelperOpen}
+        onClose={() => setIsCsvHelperOpen(false)}
+        onConfirm={() => setIsCsvHelperOpen(false)}
+        title="วิธีใช้งาน Export CSV 📊"
+        message={
+          <div className="text-left space-y-4 text-sm mt-4">
+            <div className="bg-primary/5 p-5 rounded-2xl border border-primary/10">
+              <span className="font-bold text-primary flex items-center gap-2 mb-3 text-base">
+                <Info className="w-5 h-5" /> ข้อควรรู้ในการส่งออกข้อมูล
+              </span>
+              <ul className="list-disc pl-5 space-y-3 text-text-secondary dark:text-text-muted leading-relaxed">
+                <li>ข้อมูลที่บันทึก <strong>จะเป็นข้อมูลเฉพาะในหน้าปัจจุบันเท่านั้น</strong> (อิงตามจำนวนรายการที่ตารางแสดงผล)</li>
+                <li>เพื่อให้ส่งออกข้อมูลได้เร็วที่สุด ขอแนะนำให้ปรับ <strong>"จำนวนรายการ"</strong> ด้านบนเป็น 100 หรือ 500 รายการก่อนกดส่งออก</li>
+                <li>หากข้อมูลมีหลายหน้า ให้คลิกเปลี่ยน <strong>หน้าถัดไป</strong> ด้านล่างตาราง แล้วค่อยกด Export CSV เพื่อเก็บข้อมูลของหน้าที่เหลือครับ</li>
+              </ul>
+            </div>
+          </div>
+        }
+        cancelText="เข้าใจแล้ว"
+        showConfirm={false}
+        type="info"
       />
     </div>
   );

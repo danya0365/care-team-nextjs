@@ -6,10 +6,15 @@
 
 export interface RegistrationData {
   name: string;
+  nickname: string | null;
   email: string | null;
   phone: string;
-  targetGroup: string;
   address: string | null;
+  dateOfBirth: string | null;
+  requestNeedles: boolean;
+  condomSize: string | null;
+  requestHivTest: boolean;
+  substanceAbuseHistory: string | null;
   note: string | null;
   eventId: string | null;
 }

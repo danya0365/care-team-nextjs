@@ -53,9 +53,9 @@ export function PageHeader({
             {title}
           </h1>
           {description && (
-            <p className="text-lg text-text-secondary dark:text-text-muted max-w-3xl mx-auto leading-relaxed">
+            <div className="text-lg text-text-secondary dark:text-text-muted max-w-3xl mx-auto leading-relaxed">
               {description}
-            </p>
+            </div>
           )}
           {children}
         </AnimatedSection>

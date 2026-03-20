@@ -4,6 +4,7 @@ import { Event } from '@/src/application/repositories/IEventRepository';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
 import { Pagination } from '@/src/presentation/components/common/Pagination';
@@ -11,8 +12,10 @@ import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 import { EventsViewModel } from '@/src/presentation/presenters/events/EventsPresenter';
 import { useEventsPresenter } from '@/src/presentation/presenters/events/useEventsPresenter';
 import { Calendar, CheckCircle2, Clock, Download, Edit, ExternalLink, Plus, RefreshCw, Search, Trash2, X } from 'lucide-react';
+import { Link } from 'lucide-react'; // not needed just preserving order
 import { cn } from '@/src/presentation/utils/cn';
-import Link from 'next/link';
+import NextLink from 'next/link';
+import { Skeleton } from '@/src/presentation/components/common/Skeleton';
 import { useState } from 'react';
 
 interface EventsManagementViewProps {
@@ -125,10 +128,52 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
 
   if (state.loading && !state.viewModel) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface dark:bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="text-sm font-bold text-text-muted animate-pulse">กำลังโหลดข้อมูล...</p>
+      <div className="min-h-screen pb-20">
+        <PageHeader
+          title={<Skeleton className="w-56 h-10 lg:h-14 mt-2" />}
+          description={<Skeleton className="w-full max-w-md h-5 mt-4" />}
+          spacing="default"
+        />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 w-full animate-in fade-in duration-1000">
+          <div className="flex flex-wrap gap-4 mb-6">
+            <Skeleton className="h-[52px] w-full md:w-[300px]" />
+            <Skeleton className="h-[52px] w-[180px]" />
+            <Skeleton className="h-[52px] w-[140px]" />
+            <div className="flex-1"></div>
+            <Skeleton className="h-10 w-32 rounded-2xl" />
+            <Skeleton className="h-10 w-32 rounded-2xl" />
+          </div>
+
+          <div className="rounded-[2.5rem] bg-white dark:bg-card-bg shadow-xl shadow-black/5 dark:shadow-black/20 border border-border-light dark:border-white/5 p-0 overflow-hidden">
+            <div className="bg-primary/5 dark:bg-primary-dark/5 px-6 md:px-8 py-5 flex items-center justify-between">
+               <Skeleton className="w-24 h-4 bg-primary/10" />
+               <Skeleton className="w-32 h-4 bg-primary/10" />
+               <Skeleton className="w-24 h-4 bg-primary/10" />
+               <Skeleton className="w-16 h-4 bg-primary/10" />
+            </div>
+            <div className="divide-y divide-border-light dark:divide-white/5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="px-6 md:px-8 py-6 flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="w-40 h-5" />
+                    <Skeleton className="w-32 h-4" />
+                    <Skeleton className="w-24 h-3" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="w-20 h-4" />
+                    <Skeleton className="w-16 h-4" />
+                  </div>
+                  <Skeleton className="w-24 h-6 rounded-xl" />
+                  <div className="flex gap-2">
+                     <Skeleton className="w-10 h-10 rounded-xl" />
+                     <Skeleton className="w-10 h-10 rounded-xl" />
+                     <Skeleton className="w-10 h-10 rounded-xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -174,30 +219,32 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
                 />
               </div>
 
-              <select
-                value={state.isActive === null ? '' : String(state.isActive)}
-                onChange={(e) => actions.applyFilters({ isActive: e.target.value === '' ? null : e.target.value === 'true' })}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="">ทุกสถานะ</option>
-                <option value="true">เปิดรับสมัคร</option>
-                <option value="false">ปิดรับสมัคร</option>
-              </select>
+              <div className="w-[180px]">
+                <SearchableSelect
+                  options={[
+                    { label: 'ทุกสถานะ', value: '' },
+                    { label: 'เปิดรับสมัคร', value: 'true' },
+                    { label: 'ปิดรับสมัคร', value: 'false' }
+                  ]}
+                  value={state.isActive === null ? '' : String(state.isActive)}
+                  onChange={(val) => actions.applyFilters({ isActive: val === '' ? null : val === 'true' })}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
 
-              <select
-                value={state.limit}
-                onChange={(e) => actions.changeLimit(Number(e.target.value))}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="10">10 รายการ</option>
-                <option value="20">20 รายการ</option>
-                <option value="50">50 รายการ</option>
-                <option value="100">100 รายการ</option>
-              </select>
+              <div className="w-[140px]">
+                <SearchableSelect
+                  options={[
+                    { label: '10 รายการ', value: '10' },
+                    { label: '20 รายการ', value: '20' },
+                    { label: '50 รายการ', value: '50' },
+                    { label: '100 รายการ', value: '100' }
+                  ]}
+                  value={String(state.limit)}
+                  onChange={(val) => actions.changeLimit(Number(val))}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-3">
@@ -314,14 +361,14 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
                           </td>
                           <td className="px-6 md:px-8 py-6 text-right">
                             <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
-                              <Link 
+                              <NextLink 
                                 href={`/event/${event.id}/register`}
                                 target="_blank"
                                 className="w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/10"
                                 title="ดูหน้าลงทะเบียน"
                               >
                                 <ExternalLink className="w-4 h-4" />
-                              </Link>
+                              </NextLink>
                               <button
                                 onClick={() => handleOpenModal(event)}
                                 className="w-10 h-10 rounded-xl bg-surface-elevated dark:bg-white/5 text-text-muted hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-border-light dark:border-white/5"
