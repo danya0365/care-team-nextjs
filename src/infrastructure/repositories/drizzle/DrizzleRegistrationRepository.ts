@@ -51,6 +51,7 @@ export class DrizzleRegistrationRepository implements IRegistrationRepository {
     if (search) {
       conditions.push(or(
         like(registrations.name, `%${search}%`),
+        like(registrations.nickname, `%${search}%`),
         like(registrations.email, `%${search}%`),
         like(registrations.phone, `%${search}%`)
       ));

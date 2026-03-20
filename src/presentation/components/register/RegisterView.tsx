@@ -19,17 +19,27 @@ export function RegisterView({ eventId }: RegisterViewProps) {
   
   const [formData, setFormData] = useState<RegistrationData>({
     name: '',
+    nickname: null,
     email: null,
     phone: '',
-    targetGroup: '',
     address: null,
+    dateOfBirth: null,
+    requestNeedles: false,
+    condomSize: null,
+    requestHivTest: false,
+    substanceAbuseHistory: null,
     note: null,
     eventId: eventId || null,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value || null }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value || null }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,6 +147,33 @@ export function RegisterView({ eventId }: RegisterViewProps) {
 
                   <div className="space-y-2">
                     <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">
+                      ชื่อเล่น
+                    </label>
+                    <input
+                      type="text"
+                      name="nickname"
+                      value={formData.nickname || ''}
+                      onChange={handleChange}
+                      className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted"
+                      placeholder="ตัวอย่าง: สมชาย"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">
+                      วันเดือนปีเกิด
+                    </label>
+                    <input
+                      type="date"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth || ''}
+                      onChange={handleChange}
+                      className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">
                       เบอร์โทรศัพท์ติดต่อ <span className="text-error font-bold">*</span>
                     </label>
                     <input
@@ -164,20 +201,61 @@ export function RegisterView({ eventId }: RegisterViewProps) {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ที่อยู่ / พื้นที่ปฏิบัติงาน</label>
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address || ''}
+                    onChange={handleChange}
+                    className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted"
+                    placeholder="ระบุอำเภอหรือระดับพื้นที่ เช่น สะเดา, จะนะ"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="requestNeedles"
+                      name="requestNeedles"
+                      checked={formData.requestNeedles}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded text-primary bg-surface border-border-light focus:ring-primary dark:bg-primary-dark/20 dark:border-white/10 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="requestNeedles" className="text-sm font-bold text-text-primary dark:text-foreground cursor-pointer">
+                      ขอรับบริการ เข็ม สะอาด
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="requestHivTest"
+                      name="requestHivTest"
+                      checked={formData.requestHivTest}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded text-primary bg-surface border-border-light focus:ring-primary dark:bg-primary-dark/20 dark:border-white/10 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="requestHivTest" className="text-sm font-bold text-text-primary dark:text-foreground cursor-pointer">
+                      ขอชุดตรวจ HIV ด้วยตนเอง
+                    </label>
+                  </div>
+                </div>
+
+                <div>
                   <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">
-                    กลุ่มเป้าหมาย <span className="text-error font-bold">*</span>
+                    ไซส์ถุงยางอนามัยที่ต้องการ
                   </label>
                   <div className="relative">
                     <select
-                      required
-                      name="targetGroup"
-                      value={formData.targetGroup || ''}
+                      name="condomSize"
+                      value={formData.condomSize || ''}
                       onChange={handleChange}
                       className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer font-bold text-text-primary dark:text-foreground"
                     >
-                      <option value="" disabled>คลิกเพื่อเลือกกลุ่มเป้าหมาย</option>
-                      {state.targetGroups.map(group => (
-                        <option key={group} value={group} className="dark:bg-bg-dark">{group}</option>
+                      <option value="" disabled>คลิกเพื่อเลือกไซส์ (ถ้าไม่ต้องการให้เว้นว่าง)</option>
+                      {['49', '52', '54', '56'].map(size => (
+                        <option key={size} value={size} className="dark:bg-bg-dark">{size}</option>
                       ))}
                     </select>
                     <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
@@ -187,14 +265,14 @@ export function RegisterView({ eventId }: RegisterViewProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ที่อยู่ / พื้นที่ปฏิบัติงาน</label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address || ''}
+                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ประวัติการใช้สารเสพติด (ถ้ามี)</label>
+                  <textarea
+                    name="substanceAbuseHistory"
+                    rows={2}
+                    value={formData.substanceAbuseHistory || ''}
                     onChange={handleChange}
-                    className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-text-muted"
-                    placeholder="ระบุอำเภอหรือระดับพื้นที่ เช่น สะเดา, จะนะ"
+                    className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none placeholder:text-text-muted"
+                    placeholder="ระบุประวัติย่อๆ (ข้ามได้ถ้าไม่มี)"
                   />
                 </div>
 

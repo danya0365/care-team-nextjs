@@ -8,7 +8,6 @@ import { Metadata } from 'next';
 
 export interface CreateRegistrationViewModel {
   events: Event[];
-  targetGroups: string[];
 }
 
 /**
@@ -24,25 +23,14 @@ export class CreateRegistrationPresenter {
   async getViewModel(): Promise<CreateRegistrationViewModel> {
     const eventsResult = await this.eventRepository.getAll({ isActive: true, limit: 100 });
     
-    // Static data for groups
-    const targetGroups = [
-      'ผู้ใช้สารเสพติดชนิดฉีด (PWID)',
-      'กลุ่มชายที่มีเพศสัมพันธ์ with ชาย (MSM)',
-      'พนักงานบริการ (Sex Worker)',
-      'ผู้ใช้เมทแอมเฟตามีน (Meth)',
-      'กลุ่มประชากรข้ามชาติ',
-      'กลุ่มอื่นๆ',
-    ];
-
     return {
       events: eventsResult.data,
-      targetGroups,
     };
   }
 
   async createRegistration(data: RegistrationData): Promise<Registration> {
     // Basic validation
-    if (!data.name || !data.phone || !data.targetGroup) {
+    if (!data.name || !data.phone) {
       throw new Error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
     }
 

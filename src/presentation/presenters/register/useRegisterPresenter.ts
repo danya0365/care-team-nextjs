@@ -10,7 +10,6 @@ export interface RegisterPresenterState {
   success: boolean;
   error: string | null;
   registration: Registration | null;
-  targetGroups: string[];
   eventTitle: string | null;
 }
 
@@ -90,7 +89,6 @@ export function useRegisterPresenter(
       success,
       error,
       registration,
-      targetGroups: presenter.getTargetGroups(),
       eventTitle,
     },
     { submit, reset, loadEventTitle },

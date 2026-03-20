@@ -109,10 +109,15 @@ export const registrations = sqliteTable('registrations', {
   id: text('id').primaryKey(), // UUID
   eventId: text('event_id').references(() => events.id),
   name: text('name').notNull(),
+  nickname: text('nickname'),
   email: text('email'),
   phone: text('phone').notNull(),
-  targetGroup: text('target_group').notNull(), // PWID, MSM, SW, Other
   address: text('address'),
+  dateOfBirth: text('date_of_birth'),
+  requestNeedles: integer('request_needles', { mode: 'boolean' }).notNull().default(false),
+  condomSize: text('condom_size'),
+  requestHivTest: integer('request_hiv_test', { mode: 'boolean' }).notNull().default(false),
+  substanceAbuseHistory: text('substance_abuse_history'),
   note: text('note'),
   status: text('status').notNull().default('pending'), // pending, approved, rejected
   ...timestamps,

@@ -25,7 +25,7 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
     if (!state.viewModel?.registrations.length) return;
 
     // Define CSV Headers
-    const headers = ['Name', 'Phone', 'Email', 'Status', 'Event', 'Target Group', 'Created At'];
+    const headers = ['Name', 'Phone', 'Email', 'Status', 'Event', 'Created At'];
     
     // Convert data to CSV rows
     const rows = state.viewModel.registrations.map(reg => [
@@ -34,7 +34,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
       `"${reg.email || ''}"`,
       `"${reg.status}"`,
       `"${reg.eventTitle || ''}"`,
-      `"${reg.targetGroup}"`,
       `"${new Date(reg.createdAt).toLocaleString('th-TH')}"`
     ]);
 
@@ -284,13 +283,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                           onSort={actions.applySorting} 
                         />
                         <DataTableHeader 
-                          label="กลุ่มเป้าหมาย" 
-                          sortBy="targetGroup" 
-                          currentSortBy={state.sortBy} 
-                          currentSortOrder={state.sortOrder} 
-                          onSort={actions.applySorting} 
-                        />
-                        <DataTableHeader 
                           label="สถานะ" 
                           sortBy="status" 
                           currentSortBy={state.sortBy} 
@@ -345,11 +337,6 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                                 {reg.eventTitle || 'ไม่ระบุกิจกรรม'}
                               </span>
                             </div>
-                          </td>
-                          <td className="px-6 md:px-8 py-6">
-                            <span className="inline-flex px-3 py-1.5 rounded-lg bg-surface-elevated dark:bg-primary-dark/20 text-[10px] font-bold text-text-primary dark:text-foreground border border-border-light dark:border-white/5">
-                              {reg.targetGroup}
-                            </span>
                           </td>
                           <td className="px-6 md:px-8 py-6 text-center">
                             {getStatusBadge(reg.status)}

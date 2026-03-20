@@ -8,7 +8,7 @@ import { AnimatedButton } from '@/src/presentation/components/common/AnimatedBut
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 import { RegistrationData } from '@/src/application/repositories/IRegistrationRepository';
-import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, FileEdit, AlertCircle, Users, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, FileEdit, AlertCircle, Users, RefreshCw, Calendar, PlusCircle } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 
 interface EditRegistrationViewProps {
@@ -24,14 +24,19 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
 
   useEffect(() => {
     if (state.viewModel?.registration) {
-      const { name, email, phone, targetGroup, address, note, status } = state.viewModel.registration;
-      setFormData({ name, email, phone, targetGroup, address, note, status });
+      const { name, nickname, email, phone, address, dateOfBirth, requestNeedles, condomSize, requestHivTest, substanceAbuseHistory, note, status } = state.viewModel.registration;
+      setFormData({ name, nickname, email, phone, address, dateOfBirth, requestNeedles, condomSize, requestHivTest, substanceAbuseHistory, note, status });
     }
   }, [state.viewModel]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value || null }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value || null }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -138,6 +143,31 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                   </div>
                   <div className="space-y-2">
                     <label className={labelClasses}>
+                      <User className="w-4 h-4 text-primary/60" /> ชื่อเล่น
+                    </label>
+                    <input
+                      type="text"
+                      name="nickname"
+                      value={formData.nickname || ''}
+                      onChange={handleChange}
+                      className={inputClasses}
+                      placeholder="ตัวอย่าง: สมชาย"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
+                      <Calendar className="w-4 h-4 text-primary/60" /> วันเดือนปีเกิด
+                    </label>
+                    <input
+                      type="date"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth || ''}
+                      onChange={handleChange}
+                      className={inputClasses}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
                       <Phone className="w-4 h-4 text-primary/60" /> เบอร์โทรศัพท์
                     </label>
                     <input
@@ -169,26 +199,6 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className={labelClasses}>
-                      <Users className="w-4 h-4 text-primary/60" /> กลุ่มเป้าหมาย
-                    </label>
-                    <div className="relative">
-                      <select
-                        required
-                        name="targetGroup"
-                        value={formData.targetGroup || ''}
-                        onChange={handleChange}
-                        className={`${inputClasses} appearance-none cursor-pointer`}
-                      >
-                        {state.viewModel?.targetGroups.map(group => (
-                          <option key={group} value={group} className="dark:bg-background">{group}</option>
-                        ))}
-                      </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className={labelClasses}>
                       <CheckCircle2 className="w-4 h-4 text-primary/60" /> สถานะการตรวจสอบ
                     </label>
                     <div className="relative">
@@ -206,19 +216,83 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
+                      <MapPin className="w-4 h-4 text-primary/60" /> ที่อยู่ / พื้นที่
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address || ''}
+                      onChange={handleChange}
+                      className={inputClasses}
+                      placeholder="ระบุอำเภอหรือระดับพื้นที่"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="requestNeedles"
+                      name="requestNeedles"
+                      checked={!!formData.requestNeedles}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded text-primary bg-surface border-border-light focus:ring-primary dark:bg-primary-dark/20 dark:border-white/10 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="requestNeedles" className="text-sm font-bold text-text-primary dark:text-foreground cursor-pointer">
+                      ขอรับบริการ เข็ม สะอาด
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      id="requestHivTest"
+                      name="requestHivTest"
+                      checked={!!formData.requestHivTest}
+                      onChange={handleChange}
+                      className="w-6 h-6 rounded text-primary bg-surface border-border-light focus:ring-primary dark:bg-primary-dark/20 dark:border-white/10 transition-all cursor-pointer"
+                    />
+                    <label htmlFor="requestHivTest" className="text-sm font-bold text-text-primary dark:text-foreground cursor-pointer">
+                      ขอชุดตรวจ HIV ด้วยตนเอง
+                    </label>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <label className={labelClasses}>
-                    <MapPin className="w-4 h-4 text-primary/60" /> ที่อยู่ / พื้นที่
+                    <PlusCircle className="w-4 h-4 text-primary/60" /> ไซส์ถุงยางอนามัยที่ต้องการ
                   </label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address || ''}
+                  <div className="relative">
+                    <select
+                      name="condomSize"
+                      value={formData.condomSize || ''}
+                      onChange={handleChange}
+                      className={`${inputClasses} appearance-none cursor-pointer`}
+                    >
+                      <option value="" disabled className="dark:bg-background text-text-muted italic">--- คลิกเพื่อเลือกไซส์ ---</option>
+                      {['49', '52', '54', '56'].map(size => (
+                        <option key={size} value={size} className="dark:bg-background">{size}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className={labelClasses}>
+                    <AlertCircle className="w-4 h-4 text-primary/60" /> ประวัติการใช้สารเสพติด (ถ้ามี)
+                  </label>
+                  <textarea
+                    name="substanceAbuseHistory"
+                    rows={2}
+                    value={formData.substanceAbuseHistory || ''}
                     onChange={handleChange}
-                    className={inputClasses}
-                    placeholder="ระบุอำเภอหรือระดับพื้นที่"
+                    className={`${inputClasses} resize-none h-20`}
+                    placeholder="ระบุประวัติย่อๆ (ข้ามได้ถ้าไม่มี)"
                   />
                 </div>
 
