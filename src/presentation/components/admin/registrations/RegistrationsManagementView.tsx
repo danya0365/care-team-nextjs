@@ -5,6 +5,7 @@ import { RegistrationsViewModel } from '@/src/presentation/presenters/register/R
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
@@ -134,45 +135,46 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                 />
               </div>
 
-              <select
-                value={state.status}
-                onChange={(e) => actions.applyFilters({ status: e.target.value })}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="">ทุกสถานะ</option>
-                <option value="pending">รอดำเนินการ</option>
-                <option value="approved">อนุมัติแล้ว</option>
-                <option value="rejected">ปฏิเสธ</option>
-              </select>
+              <div className="w-[180px]">
+                <SearchableSelect
+                  options={[
+                    { label: 'ทุกสถานะ', value: '' },
+                    { label: 'รอดำเนินการ', value: 'pending' },
+                    { label: 'อนุมัติแล้ว', value: 'approved' },
+                    { label: 'ปฏิเสธ', value: 'rejected' }
+                  ]}
+                  value={state.status}
+                  onChange={(val) => actions.applyFilters({ status: val })}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
 
-              <select
-                value={state.eventId || ''}
-                onChange={(e) => actions.applyFilters({ eventId: e.target.value || null })}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm max-w-[200px]"
-              >
-                <option value="">ทุกกิจกรรม</option>
-                {events.map(event => (
-                  <option key={event.id} value={event.id}>{event.title}</option>
-                ))}
-              </select>
+              <div className="w-[220px]">
+                <SearchableSelect
+                  options={[
+                    { label: 'ทุกกิจกรรม', value: '' },
+                    ...events.map(event => ({ label: event.title, value: event.id }))
+                  ]}
+                  value={state.eventId || ''}
+                  onChange={(val) => actions.applyFilters({ eventId: val || null })}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
 
-              <select
-                value={state.limit}
-                onChange={(e) => actions.changeLimit(Number(e.target.value))}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="10">10 รายการ</option>
-                <option value="20">20 รายการ</option>
-                <option value="50">50 รายการ</option>
-                <option value="100">100 รายการ</option>
-                <option value="500">500 รายการ</option>
-              </select>
+              <div className="w-[140px]">
+                <SearchableSelect
+                  options={[
+                    { label: '10 รายการ', value: '10' },
+                    { label: '20 รายการ', value: '20' },
+                    { label: '50 รายการ', value: '50' },
+                    { label: '100 รายการ', value: '100' },
+                    { label: '500 รายการ', value: '500' }
+                  ]}
+                  value={String(state.limit)}
+                  onChange={(val) => actions.changeLimit(Number(val))}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

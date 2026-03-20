@@ -7,6 +7,7 @@ import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSe
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { RegistrationData } from '@/src/application/repositories/IRegistrationRepository';
 import { ArrowLeft, Save, X, CheckCircle2, User, Phone, Mail, MapPin, FileEdit, AlertCircle, Users, RefreshCw, Calendar, PlusCircle } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
@@ -201,20 +202,16 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                     <label className={labelClasses}>
                       <CheckCircle2 className="w-4 h-4 text-primary/60" /> สถานะการตรวจสอบ
                     </label>
-                    <div className="relative">
-                      <select
-                        required
-                        name="status"
-                        value={formData.status || 'pending'}
-                        onChange={handleChange}
-                        className={`${inputClasses} appearance-none cursor-pointer font-bold`}
-                      >
-                        <option value="pending" className="dark:bg-background">🟡 รอดำเนินการ (Pending)</option>
-                        <option value="approved" className="dark:bg-background">🟢 อนุมัติแล้ว (Approved)</option>
-                        <option value="rejected" className="dark:bg-background">🔴 ปฏิเสธ (Rejected)</option>
-                      </select>
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                    </div>
+                    <SearchableSelect
+                      options={[
+                        { label: '🟡 รอดำเนินการ (Pending)', value: 'pending' },
+                        { label: '🟢 อนุมัติแล้ว (Approved)', value: 'approved' },
+                        { label: '🔴 ปฏิเสธ (Rejected)', value: 'rejected' }
+                      ]}
+                      value={formData.status || 'pending'}
+                      onChange={(val) => handleChange({ target: { name: 'status', value: val } } as any)}
+                      className={`${inputClasses} font-bold`}
+                    />
                   </div>
 
                   <div className="space-y-2">
@@ -266,20 +263,19 @@ export function EditRegistrationView({ id, initialViewModel }: EditRegistrationV
                   <label className={labelClasses}>
                     <PlusCircle className="w-4 h-4 text-primary/60" /> ไซส์ถุงยางอนามัยที่ต้องการ
                   </label>
-                  <div className="relative">
-                    <select
-                      name="condomSize"
-                      value={formData.condomSize || ''}
-                      onChange={handleChange}
-                      className={`${inputClasses} appearance-none cursor-pointer`}
-                    >
-                      <option value="" disabled className="dark:bg-background text-text-muted italic">--- คลิกเพื่อเลือกไซส์ ---</option>
-                      {['49', '52', '54', '56'].map(size => (
-                        <option key={size} value={size} className="dark:bg-background">{size}</option>
-                      ))}
-                    </select>
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">▼</div>
-                  </div>
+                  <SearchableSelect
+                    options={[
+                      { label: 'ไม่ระบุ', value: 'none' },
+                      { label: '49', value: '49' },
+                      { label: '52', value: '52' },
+                      { label: '54', value: '54' },
+                      { label: '56', value: '56' }
+                    ]}
+                    value={formData.condomSize || ''}
+                    onChange={(val) => handleChange({ target: { name: 'condomSize', value: val === 'none' ? null : val } } as any)}
+                    placeholder="คลิกเพื่อเลือกไซส์ (เว้นว่างได้)"
+                    className={inputClasses}
+                  />
                 </div>
 
                 <div className="space-y-2">

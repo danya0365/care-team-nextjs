@@ -4,6 +4,7 @@ import { Event } from '@/src/application/repositories/IEventRepository';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
 import { Pagination } from '@/src/presentation/components/common/Pagination';
@@ -174,30 +175,32 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
                 />
               </div>
 
-              <select
-                value={state.isActive === null ? '' : String(state.isActive)}
-                onChange={(e) => actions.applyFilters({ isActive: e.target.value === '' ? null : e.target.value === 'true' })}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="">ทุกสถานะ</option>
-                <option value="true">เปิดรับสมัคร</option>
-                <option value="false">ปิดรับสมัคร</option>
-              </select>
+              <div className="w-[180px]">
+                <SearchableSelect
+                  options={[
+                    { label: 'ทุกสถานะ', value: '' },
+                    { label: 'เปิดรับสมัคร', value: 'true' },
+                    { label: 'ปิดรับสมัคร', value: 'false' }
+                  ]}
+                  value={state.isActive === null ? '' : String(state.isActive)}
+                  onChange={(val) => actions.applyFilters({ isActive: val === '' ? null : val === 'true' })}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
 
-              <select
-                value={state.limit}
-                onChange={(e) => actions.changeLimit(Number(e.target.value))}
-                className="px-4 py-3.5 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md
-                  border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 
-                  outline-none transition-all font-bold text-sm"
-              >
-                <option value="10">10 รายการ</option>
-                <option value="20">20 รายการ</option>
-                <option value="50">50 รายการ</option>
-                <option value="100">100 รายการ</option>
-              </select>
+              <div className="w-[140px]">
+                <SearchableSelect
+                  options={[
+                    { label: '10 รายการ', value: '10' },
+                    { label: '20 รายการ', value: '20' },
+                    { label: '50 รายการ', value: '50' },
+                    { label: '100 รายการ', value: '100' }
+                  ]}
+                  value={String(state.limit)}
+                  onChange={(val) => actions.changeLimit(Number(val))}
+                  className="px-4 py-3 rounded-2xl bg-white/50 dark:bg-white/5 backdrop-blur-md border border-border/50 focus:border-primary focus:ring-4 focus:ring-primary/10 font-bold text-sm h-[52px]"
+                />
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

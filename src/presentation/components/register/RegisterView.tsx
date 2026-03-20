@@ -5,8 +5,9 @@ import { siteConfig } from '@/src/config/site';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
+import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { useRegisterPresenter } from '@/src/presentation/presenters/register/useRegisterPresenter';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
 
@@ -49,49 +50,85 @@ export function RegisterView({ eventId }: RegisterViewProps) {
 
   if (state.success) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4">
-        <AnimatedSection>
-          <AnimatedCard className="p-8 md:p-12 max-w-xl text-center shadow-elevated relative overflow-hidden border-t-4 border-t-success">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-success/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-            
-            <div className="w-20 h-20 bg-success/10 rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl shadow-inner animate-bounce-slow">
-              ✅
-            </div>
-            
-            <h2 className="text-3xl font-bold text-text-primary dark:text-foreground mb-4">
-              ลงทะเบียนสำเร็จ!
-            </h2>
-            
-            <p className="text-lg text-text-secondary dark:text-text-muted mb-8 italic">
-              ขอบคุณสำหรับการแจ้งความประสงค์เข้าร่วมกิจกรรมกับทีมงาน <span className="text-primary font-bold">{siteConfig.name}</span> ผ่านกิจกรรม <span className="text-primary font-bold">{state.eventTitle || 'กิจกรรมของเรา'}</span> ทางเราจะติดต่อกลับไปหาคุณโดยเร็วที่สุด
-            </p>
-            
-            <div className="bg-surface-elevated dark:bg-primary-dark/20 p-8 rounded-[2rem] mb-10 text-left border border-border-light dark:border-card-border relative group overflow-hidden">
-               <div className="absolute top-0 left-0 w-1 h-full bg-success group-hover:w-2 transition-all" />
-               <h4 className="text-xs font-black text-success uppercase tracking-[0.2em] mb-4">ข้อมูลการลงทะเบียนของคุณ</h4>
-               <div className="space-y-4">
-                 <p className="flex justify-between items-center text-sm">
-                   <span className="text-text-muted font-bold">กิจกรรม:</span> 
-                   <span className="text-text-primary dark:text-foreground font-black text-right">{state.eventTitle || 'ทั่วไป'}</span>
-                 </p>
-                 <p className="flex justify-between items-center">
-                   <span className="text-text-muted font-bold text-sm">เลขที่อ้างอิง:</span> 
-                   <span className="font-mono bg-success/10 px-3 py-1 rounded-lg text-success font-black tracking-wider">
-                     {state.registration?.id.slice(0, 8).toUpperCase()}
-                   </span>
-                 </p>
-                 <p className="flex justify-between items-center border-t border-border-light/50 dark:border-card-border/50 pt-3">
-                   <span className="text-text-muted font-bold text-sm">ชื่อผู้ลงทะเบียน:</span> 
-                   <span className="text-text-primary dark:text-foreground font-bold">{state.registration?.name}</span>
-                 </p>
-               </div>
-            </div>
-            
-            <AnimatedButton variant="primary" size="lg" onClick={actions.reset} className="w-full py-5 text-lg font-bold shadow-xl shadow-primary/20">
-              ลงทะเบียนเพิ่ม หรือ กลับสู่หน้าหลัก
-            </AnimatedButton>
-          </AnimatedCard>
-        </AnimatedSection>
+      <div className="pb-20 relative overflow-hidden min-h-[85vh] flex flex-col justify-center">
+        {/* Decorative patterns */}
+        <div className="fixed top-0 right-0 -z-10 w-[800px] h-[800px] bg-success/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="fixed bottom-0 left-0 -z-10 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+
+        <PageHeader
+          badgeText={state.eventTitle ? "Registration Successful" : "Welcome to our community"}
+          title={
+            <>
+              {state.eventTitle || 'ลงทะเบียน'} <span className="gradient-text">เสร็จสมบูรณ์</span>
+            </>
+          }
+          description="ข้อมูลของคุณได้ถูกบันทึกเข้าระบบเรียบร้อยแล้ว ทีมงานจะทำการตรวจสอบและดำเนินการในขั้นตอนต่อไป"
+          spacing="large"
+        />
+
+        <div className="max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mt-12 md:mt-4">
+          <AnimatedSection>
+            <AnimatedCard className="p-8 md:p-14 text-center shadow-2xl relative overflow-hidden border border-success/20 rounded-[2rem] bg-surface/80 dark:bg-bg-dark/80 backdrop-blur-xl">
+              {/* Card Inner Graphics */}
+              <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent pointer-events-none" />
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-success/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="w-24 h-24 bg-gradient-to-br from-success/20 to-success/5 rounded-full flex items-center justify-center mx-auto mb-8 text-5xl shadow-inner border border-success/20 relative z-10 transform hover:scale-110 transition-transform duration-500">
+                ✨
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-success to-primary mb-4 relative z-10">
+                ลงทะเบียนสำเร็จ!
+              </h2>
+              
+              <p className="text-lg text-text-secondary dark:text-text-muted mb-10 leading-relaxed font-medium">
+                ขอบคุณสำหรับการแจ้งความประสงค์เข้าร่วมกิจกรรมกับทีมงาน <br className="hidden md:block"/>
+                <span className="text-primary font-black mx-1">{siteConfig.name}</span> 
+                {state.eventTitle ? `ผ่านกิจกรรม ` : ''} 
+                {state.eventTitle && <span className="text-primary font-black mx-1">{state.eventTitle}</span>} 
+                <br className="hidden md:block"/>
+                ทางเราจะติดต่อกลับไปหาคุณโดยเร็วที่สุด
+              </p>
+              
+              <div className="bg-white/50 dark:bg-black/20 backdrop-blur-md p-6 md:p-8 rounded-[2rem] mb-10 text-left border border-success/10 relative group overflow-hidden shadow-inner">
+                 <div className="absolute top-0 left-0 w-1.5 h-full bg-success group-hover:w-2 transition-all duration-300" />
+                 
+                 <h4 className="flex items-center gap-2 text-xs font-black text-success uppercase tracking-[0.2em] mb-6">
+                   <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                   ข้อมูลสรุปการลงทะเบียน
+                 </h4>
+                 
+                 <div className="space-y-5">
+                   {state.eventTitle && (
+                     <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                       <span className="text-text-muted font-bold text-sm">กิจกรรมที่เข้าร่วม</span> 
+                       <span className="text-text-primary dark:text-foreground font-black bg-surface dark:bg-white/5 px-4 py-2 rounded-xl border border-border/50 text-sm">{state.eventTitle}</span>
+                     </div>
+                   )}
+                   <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                     <span className="text-text-muted font-bold text-sm">รหัสการอ้างอิง</span> 
+                     <span className="font-mono bg-success/10 px-4 py-2 rounded-xl text-success font-black tracking-widest border border-success/20 text-sm text-center">
+                       {state.registration?.id.slice(0, 8).toUpperCase()}
+                     </span>
+                   </div>
+                   <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 pt-5 border-t border-border-light/50 dark:border-white/5">
+                     <span className="text-text-muted font-bold text-sm">ชื่อผู้ลงทะเบียน</span> 
+                     <span className="text-text-primary dark:text-foreground font-black text-base">{state.registration?.name}</span>
+                   </div>
+                 </div>
+              </div>
+              
+              <AnimatedButton 
+                variant="primary" 
+                size="lg" 
+                onClick={actions.reset} 
+                className="w-full py-5 text-lg font-bold shadow-xl shadow-success/20 hover:shadow-success/30 bg-gradient-to-r from-success to-emerald-500 border-none group"
+              >
+                ลงทะเบียนเพิ่ม หรือ กลับสู่หน้าหลัก
+              </AnimatedButton>
+            </AnimatedCard>
+          </AnimatedSection>
+        </div>
       </div>
     );
   }
@@ -201,7 +238,7 @@ export function RegisterView({ eventId }: RegisterViewProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ที่อยู่ / พื้นที่ปฏิบัติงาน</label>
+                  <label className="block text-sm font-bold text-text-secondary dark:text-text-muted mb-2 tracking-wide">ที่อยู่</label>
                   <input
                     type="text"
                     name="address"
@@ -247,20 +284,18 @@ export function RegisterView({ eventId }: RegisterViewProps) {
                     ไซส์ถุงยางอนามัยที่ต้องการ
                   </label>
                   <div className="relative">
-                    <select
-                      name="condomSize"
+                    <SearchableSelect
+                      options={[
+                        { label: 'ไม่ระบุ', value: 'none' },
+                        { label: '49', value: '49' },
+                        { label: '52', value: '52' },
+                        { label: '54', value: '54' },
+                        { label: '56', value: '56' }
+                      ]}
                       value={formData.condomSize || ''}
-                      onChange={handleChange}
-                      className="w-full px-5 py-4 rounded-xl bg-surface-elevated dark:bg-primary-dark/20 border border-border-light dark:border-white/10 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer font-bold text-text-primary dark:text-foreground"
-                    >
-                      <option value="" disabled>คลิกเพื่อเลือกไซส์ (ถ้าไม่ต้องการให้เว้นว่าง)</option>
-                      {['49', '52', '54', '56'].map(size => (
-                        <option key={size} value={size} className="dark:bg-bg-dark">{size}</option>
-                      ))}
-                    </select>
-                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
-                      ▼
-                    </div>
+                      onChange={(val) => handleChange({ target: { name: 'condomSize', value: val === 'none' ? null : val } } as any)}
+                      placeholder="คลิกเพื่อเลือกไซส์ (เว้นว่างได้)"
+                    />
                   </div>
                 </div>
 
@@ -296,10 +331,10 @@ export function RegisterView({ eventId }: RegisterViewProps) {
 
                 <div className="pt-4">
                   <AnimatedButton
+                    type="submit"
                     variant="primary"
                     size="lg"
                     className="w-full py-5 text-lg font-bold shadow-xl shadow-primary/20 group"
-                    onClick={() => {}} // Form handles click via onSubmit
                     id="btn-submit-registration"
                   >
                     {state.submitting ? (
