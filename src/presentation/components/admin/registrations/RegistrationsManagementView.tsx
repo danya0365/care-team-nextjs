@@ -7,7 +7,7 @@ import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard'
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
-import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download } from 'lucide-react';
+import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download, Info } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
 import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
 import { Pagination } from '@/src/presentation/components/common/Pagination';
@@ -21,6 +21,7 @@ interface RegistrationsManagementViewProps {
 export function RegistrationsManagementView({ initialViewModel }: RegistrationsManagementViewProps) {
   const { state, actions } = useRegistrationsPresenter(initialViewModel);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isCsvHelperOpen, setIsCsvHelperOpen] = useState(false);
 
   const handleExportCSV = () => {
     if (!state.viewModel?.registrations.length) return;
@@ -178,16 +179,25 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
             </div>
 
             <div className="flex items-center gap-3">
-              <AnimatedButton 
-                variant="outline"
-                size="sm"
-                onClick={handleExportCSV}
-                disabled={!registrations.length}
-                className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10"
-              >
-                <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-                Export CSV
-              </AnimatedButton>
+              <div className="flex items-center gap-1">
+                <AnimatedButton 
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCSV}
+                  disabled={!registrations.length}
+                  className="bg-white/50 dark:bg-white/10 backdrop-blur-md rounded-2xl group border-primary/20 dark:border-white/10 shadow-sm pr-4"
+                >
+                  <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                  <span className="font-bold">Export CSV</span>
+                </AnimatedButton>
+                <button 
+                  onClick={() => setIsCsvHelperOpen(true)}
+                  className="w-8 h-8 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white flex items-center justify-center transition-all shadow-sm border border-primary/20"
+                  title="คำแนะนำการดึงข้อมูล"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+              </div>
 
               <AnimatedButton 
                 variant="outline"
@@ -415,6 +425,30 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
         type="danger"
         confirmText="ยืนยันการลบ"
         isLoading={state.actionLoading === deleteId}
+      />
+
+      <ConfirmModal
+        isOpen={isCsvHelperOpen}
+        onClose={() => setIsCsvHelperOpen(false)}
+        onConfirm={() => setIsCsvHelperOpen(false)}
+        title="วิธีใช้งาน Export CSV 📊"
+        message={
+          <div className="text-left space-y-4 text-sm mt-4">
+            <div className="bg-primary/5 p-5 rounded-2xl border border-primary/10">
+              <span className="font-bold text-primary flex items-center gap-2 mb-3 text-base">
+                <Info className="w-5 h-5" /> ข้อควรรู้ในการส่งออกข้อมูล
+              </span>
+              <ul className="list-disc pl-5 space-y-3 text-text-secondary dark:text-text-muted leading-relaxed">
+                <li>ข้อมูลที่บันทึก <strong>จะเป็นข้อมูลเฉพาะในหน้าปัจจุบันเท่านั้น</strong> (อิงตามจำนวนรายการที่ตารางแสดงผล)</li>
+                <li>เพื่อให้ส่งออกข้อมูลได้เร็วที่สุด ขอแนะนำให้ปรับ <strong>"จำนวนรายการ"</strong> ด้านบนเป็น 100 หรือ 500 รายการก่อนกดส่งออก</li>
+                <li>หากข้อมูลมีหลายหน้า ให้คลิกเปลี่ยน <strong>หน้าถัดไป</strong> ด้านล่างตาราง แล้วค่อยกด Export CSV เพื่อเก็บข้อมูลของหน้าที่เหลือครับ</li>
+              </ul>
+            </div>
+          </div>
+        }
+        cancelText="เข้าใจแล้ว"
+        showConfirm={false}
+        type="info"
       />
     </div>
   );
