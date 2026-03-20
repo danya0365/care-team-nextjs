@@ -32,7 +32,7 @@ export default function AdminDashboardPage() {
     { 
       title: 'ตั้งค่าระบบ', 
       desc: 'ปรับแต่งการตั้งค่าหลักของระบบและสิทธิ์ผู้ใช้งาน', 
-      href: '#', 
+      href: '/admin/settings', 
       icon: <Settings className="w-6 h-6" />,
       color: 'accent' 
     },
