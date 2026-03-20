@@ -360,7 +360,7 @@ export function EventsManagementView({ initialViewModel }: EventsManagementViewP
                             {getStatusBadge(event.isActive)}
                           </td>
                           <td className="px-6 md:px-8 py-6 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
+                            <div className="flex items-center justify-end gap-2">
                               <NextLink 
                                 href={`/event/${event.id}/register`}
                                 target="_blank"
