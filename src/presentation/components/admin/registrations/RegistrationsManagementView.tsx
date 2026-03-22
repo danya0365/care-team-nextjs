@@ -2,13 +2,15 @@
 
 import { useRegistrationsPresenter } from '@/src/presentation/presenters/register/useRegistrationsPresenter';
 import { RegistrationsViewModel } from '@/src/presentation/presenters/register/RegistrationsPresenter';
+import { Registration } from '@/src/application/repositories/IRegistrationRepository';
 import { AnimatedSection } from '@/src/presentation/components/common/AnimatedSection';
 import { AnimatedCard } from '@/src/presentation/components/common/AnimatedCard';
 import { AnimatedButton } from '@/src/presentation/components/common/AnimatedButton';
 import { SearchableSelect } from '@/src/presentation/components/common/SearchableSelect';
 import { PageHeader } from '@/src/presentation/components/layout/PageHeader';
-import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download, Info } from 'lucide-react';
+import { RefreshCw, Check, X, Edit, Trash2, Users, Clock, CheckCircle, XCircle, FileText, AlertTriangle, Plus, Search, Filter, Calendar, Download, Info, Eye } from 'lucide-react';
 import { ConfirmModal } from '@/src/presentation/components/common/ConfirmModal';
+import { RegistrationDetailModal } from './RegistrationDetailModal';
 import { DataTableHeader } from '@/src/presentation/components/common/DataTableHeader';
 import { Pagination } from '@/src/presentation/components/common/Pagination';
 import { Skeleton } from '@/src/presentation/components/common/Skeleton';
@@ -23,6 +25,7 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
   const { state, actions } = useRegistrationsPresenter(initialViewModel);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isCsvHelperOpen, setIsCsvHelperOpen] = useState(false);
+  const [viewingRegistration, setViewingRegistration] = useState<Registration | null>(null);
 
   const handleExportCSV = () => {
     if (!state.viewModel?.registrations.length) return;
@@ -409,7 +412,7 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                             {getStatusBadge(reg.status)}
                           </td>
                           <td className="px-6 md:px-8 py-6 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 transform md:translate-x-4 md:group-hover:translate-x-0">
+                            <div className="flex items-center justify-end gap-2">
                               {reg.status !== 'approved' && (
                                 <button
                                   onClick={() => actions.updateStatus(reg.id, 'approved')}
@@ -430,6 +433,13 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
                                   <X className="w-5 h-5" />
                                 </button>
                               )}
+                              <button
+                                onClick={() => setViewingRegistration(reg as Registration)}
+                                className="w-10 h-10 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/20"
+                                title="ดูรายละเอียดและพิมพ์เอกสาร"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
                               <a
                                 href={`/admin/registrations/edit/${reg.id}`}
                                 className="w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center shadow-sm border border-primary/10"
@@ -504,6 +514,12 @@ export function RegistrationsManagementView({ initialViewModel }: RegistrationsM
         cancelText="เข้าใจแล้ว"
         showConfirm={false}
         type="info"
+      />
+
+      <RegistrationDetailModal
+        isOpen={viewingRegistration !== null}
+        onClose={() => setViewingRegistration(null)}
+        registration={viewingRegistration}
       />
     </div>
   );
